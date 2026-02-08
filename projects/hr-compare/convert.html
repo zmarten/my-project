@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCX to JSON Converter</title>
+  <style>
+    :root {
+      --color-bg: #0f0f0f;
+      --color-surface: #1a1a1a;
+      --color-border: #2a2a2a;
+      --color-text: #e4e4e4;
+      --color-text-muted: #888;
+      --color-accent: #6c63ff;
+      --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --font-mono: 'Cascadia Code', 'Fira Code', monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text);
+      padding: 40px 24px;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; }
+    p.subtitle { color: var(--color-text-muted); margin-bottom: 32px; }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      margin-top: 20px;
+    }
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      color: var(--color-text);
+      font-size: 0.95rem;
+      font-family: var(--font-sans);
+    }
+    button {
+      margin-top: 24px;
+      padding: 12px 28px;
+      background: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .output-section { margin-top: 32px; }
+    .filename {
+      font-family: var(--font-mono);
+      color: var(--color-accent);
+      margin-bottom: 8px;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      color: var(--color-text);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 14px;
+      resize: vertical;
+    }
+    .manifest-entry {
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+    }
+    .manifest-entry p { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 8px; }
+    .manifest-entry code {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      white-space: pre;
+      color: var(--color-accent);
+    }
+    .copy-btn {
+      margin-top: 12px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+    .steps {
+      margin-top: 32px;
+      padding: 20px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+    }
+    .steps h3 { margin-bottom: 12px; font-size: 1rem; }
+    .steps ol { padding-left: 20px; color: var(--color-text-muted); line-height: 2; }
+  </style>
+</head>
+<body>
+
+  <h1>TCX to JSON Converter</h1>
+  <p class="subtitle">Convert a Garmin TCX export into a JSON file for the HR Compare tool.</p>
+
+  <label for="workout-name">Workout Name</label>
+  <input type="text" id="workout-name" placeholder="e.g. Murph, 5K Tempo, CrossFit 24.1">
+
+  <label for="tcx-file">TCX File</label>
+  <input type="file" id="tcx-file" accept=".tcx">
+
+  <button id="convert-btn" disabled>Convert to JSON</button>
+
+  <div id="output" class="output-section" style="display:none;">
+    <label>Suggested filename:</label>
+    <div class="filename" id="suggested-filename"></div>
+
+    <label>JSON output (copy this into a new file in workouts/):</label>
+    <textarea id="json-output" readonly></textarea>
+    <button class="copy-btn" id="copy-json">Copy JSON</button>
+
+    <div class="manifest-entry">
+      <p>Add this entry to <strong>manifest.json</strong>:</p>
+      <code id="manifest-entry"></code>
+      <button class="copy-btn" id="copy-manifest">Copy Manifest Entry</button>
+    </div>
+  </div>
+
+  <div class="steps">
+    <h3>After converting:</h3>
+    <ol>
+      <li>Save the JSON as a new file in <code>projects/hr-compare/workouts/</code></li>
+      <li>Add the manifest entry to <code>projects/hr-compare/workouts/manifest.json</code></li>
+      <li>Commit and push to deploy</li>
+    </ol>
+  </div>
+
+  <script>
+    var nameInput = document.getElementById('workout-name');
+    var fileInput = document.getElementById('tcx-file');
+    var convertBtn = document.getElementById('convert-btn');
+
+    function checkReady() {
+      convertBtn.disabled = !(nameInput.value.trim() && fileInput.files.length);
+    }
+
+    nameInput.addEventListener('input', checkReady);
+    fileInput.addEventListener('change', checkReady);
+
+    convertBtn.addEventListener('click', function () {
+      var file = fileInput.files[0];
+      var workoutName = nameInput.value.trim();
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        try {
+          var result = parseTCX(e.target.result, workoutName);
+          showOutput(result, workoutName);
+        } catch (err) {
+          alert('Error parsing TCX: ' + err.message);
+        }
+      };
+
+      reader.readAsText(file);
+    });
+
+    function parseTCX(xmlString, workoutName) {
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(xmlString, 'application/xml');
+
+      if (doc.querySelector('parsererror')) {
+        throw new Error('Invalid TCX file');
+      }
+
+      var ns = 'http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2';
+      var activity = doc.getElementsByTagNameNS(ns, 'Activity')[0];
+      var sport = activity ? activity.getAttribute('Sport') : 'Unknown';
+      var idEl = doc.getElementsByTagNameNS(ns, 'Id')[0];
+      var activityDate = idEl ? idEl.textContent : '';
+
+      var trackpoints = doc.getElementsByTagNameNS(ns, 'Trackpoint');
+      var dataPoints = [];
+      var startTime = null;
+
+      for (var i = 0; i < trackpoints.length; i++) {
+        var tp = trackpoints[i];
+        var timeEl = tp.getElementsByTagNameNS(ns, 'Time')[0];
+        var hrEl = tp.getElementsByTagNameNS(ns, 'HeartRateBpm')[0];
+        if (!timeEl || !hrEl) continue;
+
+        var time = new Date(timeEl.textContent);
+        var hr = parseInt(hrEl.getElementsByTagNameNS(ns, 'Value')[0].textContent, 10);
+        if (startTime === null) startTime = time;
+
+        dataPoints.push({
+          elapsedSeconds: (time - startTime) / 1000,
+          hr: hr
+        });
+      }
+
+      if (dataPoints.length === 0) {
+        throw new Error('No heart rate data found');
+      }
+
+      return {
+        name: workoutName,
+        date: activityDate.split('T')[0],
+        sport: sport,
+        athlete: 'Zach',
+        totalTimeSeconds: dataPoints[dataPoints.length - 1].elapsedSeconds,
+        dataPoints: dataPoints
+      };
+    }
+
+    function showOutput(data, workoutName) {
+      var slug = workoutName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
+      var filename = slug + '-' + data.date + '.json';
+
+      document.getElementById('suggested-filename').textContent = filename;
+      document.getElementById('json-output').value = JSON.stringify(data, null, 2);
+
+      var entry = {
+        file: filename,
+        name: workoutName,
+        date: data.date,
+        sport: data.sport
+      };
+      document.getElementById('manifest-entry').textContent = JSON.stringify(entry, null, 2);
+
+      document.getElementById('output').style.display = '';
+    }
+
+    document.getElementById('copy-json').addEventListener('click', function () {
+      navigator.clipboard.writeText(document.getElementById('json-output').value);
+      this.textContent = 'Copied!';
+      var btn = this;
+      setTimeout(function () { btn.textContent = 'Copy JSON'; }, 1500);
+    });
+
+    document.getElementById('copy-manifest').addEventListener('click', function () {
+      navigator.clipboard.writeText(document.getElementById('manifest-entry').textContent);
+      this.textContent = 'Copied!';
+      var btn = this;
+      setTimeout(function () { btn.textContent = 'Copy Manifest Entry'; }, 1500);
+    });
+  </script>
+
+</body>
+</html>

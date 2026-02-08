@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heart Rate Compare | Zach Martens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../../index.html" class="nav-logo">ZM</a>
+    <span class="page-title">Heart Rate Compare</span>
+  </nav>
+
+  <main class="container">
+
+    <!-- Setup Panel -->
+    <section class="setup-panel">
+      <div class="setup-card">
+        <h3>Zach's Workout</h3>
+        <select id="workout-select">
+          <option value="">Choose a workout...</option>
+        </select>
+        <div id="workout-info" class="workout-meta"></div>
+      </div>
+
+      <div class="setup-card">
+        <h3>Your Workout</h3>
+        <div id="upload-zone" class="upload-zone">
+          <p>Drag &amp; drop your .tcx file here</p>
+          <p class="upload-hint">or click to browse</p>
+          <input type="file" id="tcx-input" accept=".tcx" hidden>
+        </div>
+        <div id="upload-info" class="workout-meta"></div>
+        <input type="text" id="athlete-name" placeholder="Your name (optional)" class="name-input">
+      </div>
+
+      <div class="setup-actions">
+        <button id="compare-btn" class="btn btn-primary" disabled>Compare Heart Rates</button>
+        <button id="view-btn" class="btn btn-outline" disabled>Just View Zach's</button>
+      </div>
+    </section>
+
+    <!-- Chart -->
+    <section id="chart-section" class="chart-section hidden">
+      <div class="chart-wrapper">
+        <canvas id="hr-chart"></canvas>
+      </div>
+      <div class="red-zone-legend">
+        <span class="red-zone-swatch"></span>
+        <p><strong>Red Zone (160+ bpm)</strong> — High-intensity effort where your heart is working at or near its max. Spending time here builds power and speed, but recovery is essential. The shaded area on the chart highlights when either athlete entered the red zone.</p>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section id="stats-section" class="stats-section hidden">
+      <div class="stats-grid" id="stats-grid"></div>
+    </section>
+
+    <!-- Help -->
+    <details class="help-section">
+      <summary>How to export a TCX file from Garmin Connect</summary>
+      <ol>
+        <li>Go to <a href="https://connect.garmin.com" target="_blank" rel="noopener">connect.garmin.com</a> and log in</li>
+        <li>Click <strong>Activities</strong> and select your workout</li>
+        <li>Click the gear icon in the upper right</li>
+        <li>Select <strong>"Export to TCX"</strong></li>
+        <li>Upload the downloaded .tcx file above</li>
+      </ol>
+    </details>
+
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 Zach Martens</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
+  <script src="app.js"></script>
+</body>
+</html>

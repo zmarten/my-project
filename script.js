@@ -75,7 +75,7 @@ window.addEventListener('scroll', () => {
 
     if (link) {
       if (scrollY >= top && scrollY < top + height) {
-        link.style.color = 'var(--color-text)';
+        link.style.color = 'var(--forest-deep)';
       } else {
         link.style.color = '';
       }
