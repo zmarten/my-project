@@ -398,6 +398,29 @@ img {
   gap: 10px;
 }
 
+.project-card-soon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--mist-light);
+  background: transparent;
+  box-shadow: none;
+  min-height: 200px;
+}
+
+.project-card-soon .project-info {
+  text-align: center;
+}
+
+.project-card-soon h3 {
+  color: var(--sage-medium);
+}
+
+.project-card-soon p {
+  color: var(--stone-medium);
+  font-style: italic;
+}
+
 /* ── About ───────────────────────────────────────────── */
 .about {
   padding: 96px 0;

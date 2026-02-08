@@ -180,6 +180,15 @@ a {
   cursor: not-allowed;
 }
 
+.privacy-note {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+  color: var(--stone-medium);
+  text-align: center;
+  line-height: 1.5;
+  padding: 0 24px;
+}
+
 .setup-card {
   background: var(--pure-white);
   border: 1px solid var(--mist-light);
