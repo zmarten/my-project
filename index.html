@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zach Martens | Paternity Leave Playground</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="#hero" class="nav-logo">ZM</a>
+    <button class="nav-toggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <div class="hero-content fade-in">
+      <p class="hero-greeting">Hello, I'm</p>
+      <h1 class="hero-name">Zach Martens</h1>
+      <p class="hero-tagline">Product Manager &amp; Curious Tinkerer</p>
+      <p class="hero-description">
+        On paternity leave, building things between naps and bottles.
+        This is my playground for documenting what I get to explore when Zoey allows.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">See What I've Built</a>
+        <a href="https://www.linkedin.com/in/zachmartens/" target="_blank" rel="noopener" class="btn btn-outline">LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects" class="projects">
+    <div class="container">
+      <h2 class="section-title fade-in">The Playground</h2>
+      <p class="section-subtitle fade-in">Things I've tinkered with, built, or broken while on leave.</p>
+      <div class="project-filters fade-in">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="code">Code</button>
+        <button class="filter-btn" data-filter="product">Product</button>
+        <button class="filter-btn" data-filter="learning">Learning</button>
+      </div>
+      <div class="project-grid fade-in">
+        <!-- Empty state — add projects here later -->
+        <div class="project-empty">
+          <div class="project-empty-icon">+</div>
+          <p>Experiments incoming. Zoey's nap schedule permitting.</p>
+        </div>
+        <!--
+        Example project card (copy and customize):
+        <div class="project-card" data-category="code">
+          <div class="project-image">
+            <img src="project-image.jpg" alt="Project Name">
+          </div>
+          <div class="project-info">
+            <h3>Project Name</h3>
+            <p>Brief description of the project.</p>
+            <div class="project-tags">
+              <span>HTML</span>
+              <span>CSS</span>
+              <span>JS</span>
+            </div>
+            <div class="project-links">
+              <a href="#" class="btn btn-small">Live Demo</a>
+              <a href="#" class="btn btn-small btn-outline">Source</a>
+            </div>
+          </div>
+        </div>
+        -->
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about">
+    <div class="container about-grid">
+      <div class="about-text fade-in">
+        <h2 class="section-title">About Me</h2>
+        <p>
+          I'm a product manager who spends most days thinking about user problems,
+          roadmaps, and how to ship the right thing. Right now, though, I'm on
+          paternity leave with my daughter Zoey, and using the downtime to get
+          my hands dirty with tools and tech I don't normally get to touch.
+        </p>
+        <p>
+          This site is equal parts sandbox and journal. It's where I document
+          the things I'm learning, building, and experimenting with while I have
+          a rare window to just play.
+        </p>
+        <div class="skills">
+          <span class="skill-tag">Product Strategy</span>
+          <span class="skill-tag">Roadmapping</span>
+          <span class="skill-tag">User Research</span>
+          <span class="skill-tag">Data Analysis</span>
+          <span class="skill-tag">Prototyping</span>
+          <span class="skill-tag">AI Tools</span>
+          <span class="skill-tag">HTML/CSS/JS</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact">
+    <div class="container">
+      <h2 class="section-title fade-in">Say Hello</h2>
+      <p class="contact-intro fade-in">
+        Want to chat about product, tech, or parenting survival tips? Reach out.
+      </p>
+      <div class="contact-links fade-in">
+        <a href="mailto:zachdmartens@gmail.com" class="contact-card">
+          <span class="contact-icon">@</span>
+          <span class="contact-label">Email</span>
+          <span class="contact-value">zachdmartens@gmail.com</span>
+        </a>
+        <a href="https://www.linkedin.com/in/zachmartens/" target="_blank" rel="noopener" class="contact-card">
+          <span class="contact-icon">in</span>
+          <span class="contact-label">LinkedIn</span>
+          <span class="contact-value">linkedin.com/in/zachmartens</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2026 Zach Martens. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
