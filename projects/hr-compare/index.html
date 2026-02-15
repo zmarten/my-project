@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Heart Rate Compare | Zach Martens</title>
+  <title>HR Performance | Zach Martens</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
 
   <nav class="navbar">
     <a href="../../index.html" class="nav-logo">ZM</a>
-    <span class="page-title">Heart Rate Compare</span>
+    <span class="page-title">HR Performance</span>
   </nav>
 
   <main class="container">
@@ -21,40 +21,42 @@
     <!-- Setup Panel -->
     <section class="setup-panel">
       <div class="setup-card">
-        <h3>Zach's Workout</h3>
+        <h3>Select Workout</h3>
         <select id="workout-select">
           <option value="">Choose a workout...</option>
         </select>
         <div id="workout-info" class="workout-meta"></div>
       </div>
-
-      <div class="setup-card">
-        <h3>Your Workout</h3>
-        <div id="upload-zone" class="upload-zone">
-          <p>Drag &amp; drop your .tcx file here</p>
-          <p class="upload-hint">or click to browse</p>
-          <input type="file" id="tcx-input" accept=".tcx" hidden>
-        </div>
-        <div id="upload-info" class="workout-meta"></div>
-        <input type="text" id="athlete-name" placeholder="Your name (optional)" class="name-input">
-      </div>
-
-      <p class="privacy-note">Your data stays private. Your TCX file is processed entirely in your browser. It is never uploaded to any server or stored anywhere. When you close this page, the data is gone.</p>
-
-      <div class="setup-actions">
-        <button id="compare-btn" class="btn btn-primary" disabled>Compare Heart Rates</button>
-        <button id="view-btn" class="btn btn-outline" disabled>Just View Zach's</button>
-      </div>
     </section>
 
     <!-- Chart -->
     <section id="chart-section" class="chart-section hidden">
+      <div class="chart-controls">
+        <button id="reset-zoom-btn" class="btn-small hidden">Reset Zoom</button>
+        <button id="select-range-btn" class="btn-small">Select Range</button>
+        <div class="zone-toggles">
+          <button class="zone-pill zone-pill-1" data-zone="0" aria-pressed="false">Z1</button>
+          <button class="zone-pill zone-pill-2" data-zone="1" aria-pressed="false">Z2</button>
+          <button class="zone-pill zone-pill-3" data-zone="2" aria-pressed="false">Z3</button>
+          <button class="zone-pill zone-pill-4" data-zone="3" aria-pressed="false">Z4</button>
+          <button class="zone-pill zone-pill-5" data-zone="4" aria-pressed="false">Z5</button>
+          <button class="zone-pill zone-pill-all" id="zone-all-btn">All</button>
+        </div>
+      </div>
       <div class="chart-wrapper">
         <canvas id="hr-chart"></canvas>
       </div>
-      <div class="red-zone-legend">
-        <span class="red-zone-swatch"></span>
-        <p><strong>Red Zone (160+ bpm)</strong> — High-intensity effort where your heart is working at or near its max. Spending time here builds power and speed, but recovery is essential. The shaded area on the chart highlights when either athlete entered the red zone.</p>
+      <div class="zone-legend-note">
+        <p><strong>HR Zones</strong> — Z1 Recovery (95–114) · Z2 Endurance (114–133) · Z3 Tempo (133–152) · Z4 Threshold (152–171) · Z5 VO2 Max (171–190)</p>
+      </div>
+
+      <!-- Segment Stats Panel -->
+      <div id="segment-panel" class="segment-panel hidden" aria-live="polite">
+        <div class="segment-header">
+          <h4>Selected Range</h4>
+          <button id="clear-segment-btn" class="btn-small">Clear</button>
+        </div>
+        <div id="segment-stats" class="segment-stats"></div>
       </div>
     </section>
 
@@ -63,17 +65,105 @@
       <div class="stats-grid" id="stats-grid"></div>
     </section>
 
-    <!-- Help -->
-    <details class="help-section">
-      <summary>How to export a TCX file from Garmin Connect</summary>
-      <ol>
-        <li>Go to <a href="https://connect.garmin.com" target="_blank" rel="noopener">connect.garmin.com</a> and log in</li>
-        <li>Click <strong>Activities</strong> and select your workout</li>
-        <li>Click the gear icon in the upper right</li>
-        <li>Select <strong>"Export to TCX"</strong></li>
-        <li>Upload the downloaded .tcx file above</li>
-      </ol>
-    </details>
+    <!-- Performance Insights -->
+    <section id="insights-section" class="insights-section hidden">
+      <h2 class="section-title">Performance Insights</h2>
+      <div class="insights-grid">
+        <!-- Zone Breakdown -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <h3>HR Zone Breakdown</h3>
+            <button class="tooltip-trigger" aria-label="About zone breakdown">i</button>
+          </div>
+          <div class="tooltip-content hidden">
+            <p>Shows how your workout time is distributed across heart rate training zones. Each zone targets different physiological adaptations.</p>
+            <p><strong>Why it matters for mountain hunting:</strong> Backcountry hunting demands a strong aerobic base. Most of your training time should fall in Z1–Z3. If you're spending too much time in Z4–Z5, you may be overtraining intensity and under-building endurance.</p>
+            <p>Click a zone row below to toggle its band on the chart.</p>
+            <p class="tooltip-source">Research: <a href="https://www.trainingpeaks.com/blog/zone-2-training-for-endurance-athletes/" target="_blank" rel="noopener">TrainingPeaks: Zone 2 Training</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6537749/" target="_blank" rel="noopener">Tønnessen et al., 2019</a></p>
+          </div>
+          <div class="zone-chart-wrapper">
+            <canvas id="zone-doughnut"></canvas>
+          </div>
+          <div id="zone-breakdown-list" class="zone-breakdown-list"></div>
+        </div>
+
+        <!-- Recovery Analysis -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <h3>Recovery Analysis</h3>
+            <button class="tooltip-trigger" aria-label="About recovery analysis">i</button>
+          </div>
+          <div class="tooltip-content hidden">
+            <p>Measures how quickly your heart rate drops after reaching peak effort. Faster recovery = better cardiovascular fitness and autonomic nervous system health.</p>
+            <p><strong>Why it matters for mountain hunting:</strong> In the mountains you're constantly hitting steep climbs then stopping to glass or catch your breath. Fast HR recovery means you're ready for the next push sooner — critical when an animal is moving and you need to close distance.</p>
+            <p>A 60-second drop of 20+ bpm is good. 30+ bpm is excellent. Click a row in the table to highlight that peak on the chart.</p>
+            <p class="tooltip-source">Research: <a href="https://pubmed.ncbi.nlm.nih.gov/10536127/" target="_blank" rel="noopener">Cole et al., 1999 (NEJM)</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/22357753/" target="_blank" rel="noopener">Daanen et al., 2012</a></p>
+          </div>
+          <div id="recovery-metrics" class="recovery-metrics"></div>
+          <div id="recovery-table-wrapper" class="recovery-table-wrapper"></div>
+        </div>
+
+        <!-- Peak Intervals -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <h3>Peak Intervals</h3>
+            <button class="tooltip-trigger" aria-label="About peak intervals">i</button>
+          </div>
+          <div class="tooltip-content hidden">
+            <p>Identifies the hardest 1-minute and 5-minute stretches of your workout based on highest average heart rate. These represent your peak cardiovascular output.</p>
+            <p><strong>Why it matters for mountain hunting:</strong> The 1-minute peak simulates a steep scramble or sprint to a ridge. The 5-minute peak simulates a sustained steep climb with a heavy pack. Tracking these over time shows whether your peak capacity is improving.</p>
+            <p>Click a peak interval to highlight that time range on the chart.</p>
+            <p class="tooltip-source">Research: <a href="https://pubmed.ncbi.nlm.nih.gov/17414804/" target="_blank" rel="noopener">Helgerud et al., 2007</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3774727/" target="_blank" rel="noopener">Bacon et al., 2013</a></p>
+          </div>
+          <div id="peak-intervals" class="peak-intervals"></div>
+        </div>
+
+        <!-- Cardiac Drift -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <h3>Cardiac Drift</h3>
+            <button class="tooltip-trigger" aria-label="About cardiac drift">i</button>
+          </div>
+          <div class="tooltip-content hidden">
+            <p>Cardiac drift is the gradual rise in heart rate during sustained exercise, even at constant effort. It's caused by dehydration, rising core temperature, and reduced stroke volume.</p>
+            <p><strong>Why it matters for mountain hunting:</strong> Lower drift means your cardiovascular system handles long, sustained efforts more efficiently — critical for all-day mountain days where you may cover 10+ miles at elevation.</p>
+            <p>A drift under 5% is excellent. 5–10% is normal. Over 10% suggests your aerobic base needs work. Click the drift card to see the first/second half split on the chart.</p>
+            <p class="tooltip-source">Research: <a href="https://pubmed.ncbi.nlm.nih.gov/11337829/" target="_blank" rel="noopener">Coyle &amp; González-Alonso, 2001</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/34717912/" target="_blank" rel="noopener">Wingo et al., 2021</a></p>
+          </div>
+          <div id="cardiac-drift" class="cardiac-drift-content"></div>
+        </div>
+
+        <!-- Longest Sustained Effort -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <h3>Longest Sustained Effort</h3>
+            <button class="tooltip-trigger" aria-label="About sustained effort">i</button>
+          </div>
+          <div class="tooltip-content hidden">
+            <p>The longest continuous stretch where your heart rate stayed in the aerobic zones (Z2 Endurance + Z3 Tempo, 114–152 bpm) without dropping below or spiking above.</p>
+            <p><strong>Why it matters for mountain hunting:</strong> This directly measures your ability to grind uphill at a steady pace without blowing up. Longer sustained efforts = more miles before you gas out on a steep ridge.</p>
+            <p>For mountain hunting, aim to build this toward 30–60+ minutes of continuous aerobic work. Click to highlight this effort on the chart.</p>
+            <p class="tooltip-source">Research: <a href="https://www.trainingpeaks.com/blog/zone-2-training-for-endurance-athletes/" target="_blank" rel="noopener">TrainingPeaks: Zone 2 Training</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6537749/" target="_blank" rel="noopener">Tønnessen et al., 2019</a></p>
+          </div>
+          <div id="sustained-effort" class="sustained-effort-content"></div>
+        </div>
+
+        <!-- TRIMP Score -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <h3>TRIMP Score</h3>
+            <button class="tooltip-trigger" aria-label="About TRIMP score">i</button>
+          </div>
+          <div class="tooltip-content hidden">
+            <p>Training Impulse (TRIMP) is a single number that captures total training load by weighting time spent at each HR zone. Higher zones contribute exponentially more load per minute.</p>
+            <p><strong>Why it matters for mountain hunting:</strong> TRIMP lets you compare workouts objectively — a long easy hike vs. a short intense climb. Track this over weeks to make sure your training load is progressively building toward hunting season.</p>
+            <p>Zone weights: Z1 = 1x, Z2 = 2x, Z3 = 3x, Z4 = 4x, Z5 = 5x. A score of 100–200 is moderate, 200+ is a hard session.</p>
+            <p class="tooltip-source">Research: <a href="https://pubmed.ncbi.nlm.nih.gov/24942164/" target="_blank" rel="noopener">Wallace et al., 2014</a> · <a href="https://www.firstbeat.com/en/blog/what-is-trimp/" target="_blank" rel="noopener">Firstbeat: What is TRIMP?</a></p>
+          </div>
+          <div id="trimp-score" class="trimp-content"></div>
+        </div>
+      </div>
+    </section>
 
   </main>
 
@@ -83,6 +173,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2"></script>
   <script src="app.js"></script>
 </body>
 </html>
