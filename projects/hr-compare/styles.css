@@ -352,6 +352,62 @@ a {
   color: var(--stone-dark);
 }
 
+/* ── Block Legend ────────────────────────────────────── */
+.block-legend {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--cloud-white);
+  border: 1px solid var(--mist-light);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.block-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+  transition: background var(--transition);
+}
+
+.block-legend-item:hover {
+  background: rgba(45, 90, 74, 0.06);
+}
+
+.block-legend-swatch {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.block-legend-name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--stone-dark);
+  font-family: var(--font-display);
+}
+
+.block-legend-time {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--stone-medium);
+}
+
+.block-legend-no-data {
+  opacity: 0.55;
+  font-style: italic;
+}
+
+.block-legend-no-data .block-legend-time {
+  font-style: italic;
+}
+
 /* ── Segment Panel ───────────────────────────────────── */
 .segment-panel {
   margin-top: 20px;

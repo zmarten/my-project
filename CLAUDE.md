@@ -10,10 +10,14 @@
 ## Project Overview
 Static portfolio/playground site at **zachmartens.com**. No backend — everything runs client-side. Hosted on Cloudflare Pages with auto-deploy from GitHub on every push to `master`.
 
+**Local path**: `D:\my-project`
+
 ## Tech Stack
 - HTML, CSS, JavaScript (no frameworks)
 - Chart.js v4 (via CDN) for data visualization
 - chartjs-plugin-annotation v3 (via CDN) for chart overlays
+- chartjs-plugin-zoom v2 (via CDN) for zoom/pan
+- Hammer.js v2 (via CDN) for touch gesture support
 - Cloudflare Pages for hosting (wrangler.jsonc config)
 - GitHub repo: zmarten/my-project
 - Git credentials managed via `gh auth setup-git`
@@ -37,9 +41,9 @@ my-project/
 ├── CLAUDE.md                   — This file
 └── projects/
     └── hr-compare/
-        ├── index.html          — HR Compare app page
-        ├── styles.css          — HR Compare styles (same design system)
-        ├── app.js              — TCX parsing, Chart.js rendering, stats
+        ├── index.html          — HR Performance dashboard page
+        ├── styles.css          — Dashboard styles (same design system)
+        ├── app.js              — Chart rendering, zone system, insights algorithms
         ├── convert.html        — Zach's tool to convert TCX → JSON
         └── workouts/
             ├── manifest.json   — Array of available workouts for dropdown
@@ -71,14 +75,16 @@ Cloudflare Pages detects the push and deploys automatically (~60 seconds).
 ## Architecture Decisions
 - **No backend**: All visitor data processing happens in-browser via FileReader + DOMParser. TCX files never leave the visitor's device. This is intentional for privacy and simplicity.
 - **Workout data as JSON files in repo**: Zach's workouts are pre-committed JSON. No database needed. The tradeoff is manual conversion, but it's simple and free.
-- **Privacy note**: HR Compare page explicitly tells visitors their data stays in-browser and is never uploaded.
-- **CDN for libraries**: Chart.js and annotation plugin loaded via jsdelivr CDN. No npm/build step.
+- **Single-user dashboard**: HR Performance page is Zach's personal dashboard (no visitor upload). Focused on mountain hunting/hiking fitness metrics.
+- **CDN for libraries**: Chart.js, annotation plugin, zoom plugin, and Hammer.js loaded via jsdelivr CDN. No npm/build step.
 
 ## Key Technical Patterns
-- **TCX parsing**: Uses `DOMParser` with `getElementsByTagNameNS` (Garmin namespace: `http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2`). Must use namespace-aware methods or it silently returns nothing.
+- **TCX parsing**: Uses `DOMParser` with `getElementsByTagNameNS` (Garmin namespace: `http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2`). Must use namespace-aware methods or it silently returns nothing. (Used in convert.html only — dashboard reads pre-converted JSON.)
 - **Time normalization**: Absolute timestamps converted to elapsed seconds from first trackpoint so workouts on different days can be overlaid.
-- **Data resampling**: HR data is resampled to 30-second intervals with linear interpolation so two datasets align on a shared time axis.
-- **Red zone**: Defined as 160+ bpm. Annotated on chart with shaded box + dashed line via chartjs-plugin-annotation.
+- **Data resampling**: HR data is resampled to 30-second intervals with linear interpolation for the chart's x-axis.
+- **HR Zones**: 5-zone system based on MAX_HR=190. Zone bands are dynamic chart annotations toggled via pill buttons. Zone thresholds: Z1 50-60%, Z2 60-70%, Z3 70-80%, Z4 80-90%, Z5 90-100%.
+- **Chart interactivity**: Zoom/pan via chartjs-plugin-zoom (disabled when in segment selection mode). Insight cards add highlight annotations to the chart on click.
+- **Performance insights**: 6 cards — Zone Breakdown (doughnut chart), Recovery Analysis (peak detection + 60s recovery), Peak Intervals (sliding window), Cardiac Drift (1st vs 2nd half avg HR), Longest Sustained Effort (consecutive Z2-Z3 time), TRIMP Score (zone-weighted training load).
 - **Chart destruction**: Must call `chartInstance.destroy()` before re-rendering or Chart.js will stack canvases.
 
 ## Future Ideas (discussed but not built)

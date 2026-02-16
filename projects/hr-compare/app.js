@@ -18,6 +18,7 @@ var selectionStart = null;
 var selectionEnd = null;
 var sustainedEffortRange = null;
 var peakIntervalRanges = {};
+var blocksVisible = false;
 
 // ── Init ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', init);
@@ -63,6 +64,8 @@ function setupEventListeners() {
       toggleZone(parseInt(pill.dataset.zone, 10));
     });
   });
+
+  document.getElementById('toggle-blocks-btn').addEventListener('click', toggleBlocks);
 
   // Tooltip click-to-toggle
   document.querySelectorAll('.tooltip-trigger').forEach(function (btn) {
@@ -138,8 +141,60 @@ function renderDashboard() {
   renderStats(stats);
 
   renderInsights(zachData);
+  renderBlockLegend(zachData);
 
   document.getElementById('chart-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderBlockLegend(data) {
+  var legend = document.getElementById('block-legend');
+  if (!legend) return;
+
+  if (!data.blocks || data.blocks.length === 0) {
+    legend.classList.add('hidden');
+    document.getElementById('toggle-blocks-btn').classList.add('hidden');
+    return;
+  }
+
+  document.getElementById('toggle-blocks-btn').classList.remove('hidden');
+
+  var html = '';
+  data.blocks.forEach(function (block, i) {
+    var colors = getBlockColor(block, i);
+    var noData = block.noData;
+    var partial = block.partialData;
+    var timeLabel = '';
+
+    if (noData && block.endSeconds <= 0) {
+      timeLabel = 'No HR data';
+    } else if (partial) {
+      timeLabel = formatTime(Math.max(0, block.startSeconds)) + ' \u2013 end (partial HR)';
+    } else {
+      timeLabel = formatTime(block.startSeconds) + ' \u2013 ' + formatTime(block.endSeconds);
+    }
+
+    var dimmedClass = noData ? ' block-legend-no-data' : '';
+    html += '<div class="block-legend-item' + dimmedClass + '" data-block-index="' + i + '">' +
+      '<span class="block-legend-swatch" style="background: ' + colors.border + '"></span>' +
+      '<span class="block-legend-name">' + block.name + '</span>' +
+      '<span class="block-legend-time">' + timeLabel + '</span>' +
+    '</div>';
+  });
+  legend.innerHTML = html;
+  legend.classList.toggle('hidden', !blocksVisible);
+
+  // Click a block legend item to highlight that block on the chart
+  legend.querySelectorAll('[data-block-index]').forEach(function (item) {
+    item.addEventListener('click', function () {
+      var idx = parseInt(item.dataset.blockIndex, 10);
+      var block = data.blocks[idx];
+      if (!block || (block.noData && block.endSeconds <= 0)) return;
+      clearHighlights();
+      var colors = getBlockColor(block, idx);
+      highlightTimeRange(Math.max(0, block.startSeconds), Math.min(block.endSeconds, data.totalTimeSeconds), colors.bg, 'block_' + idx);
+      scrollToChart();
+    });
+  });
 }
 
 // ── Reset dashboard ──────────────────────────────────
@@ -163,7 +218,11 @@ function resetDashboard() {
   selectMode = false;
   sustainedEffortRange = null;
   peakIntervalRanges = {};
+  blocksVisible = false;
   document.getElementById('select-range-btn').classList.remove('active');
+  document.getElementById('toggle-blocks-btn').classList.remove('active');
+  var blockLegend = document.getElementById('block-legend');
+  if (blockLegend) blockLegend.classList.add('hidden');
   clearSegment();
 
   // Close any open tooltips
@@ -229,6 +288,98 @@ function buildZoneAnnotations() {
     };
   }
   return annotations;
+}
+
+// ── Block Annotations ────────────────────────────────
+var BLOCK_COLORS = [
+  { bg: 'rgba(107, 143, 113, 0.06)', border: 'rgba(107, 143, 113, 0.4)' },   // sage — warm-up/setup/rest
+  { bg: 'rgba(45, 90, 74, 0.07)', border: 'rgba(45, 90, 74, 0.35)' },         // forest — block 1
+  { bg: 'rgba(201, 162, 119, 0.07)', border: 'rgba(201, 162, 119, 0.35)' },    // earth — block 2
+  { bg: 'rgba(168, 95, 82, 0.07)', border: 'rgba(168, 95, 82, 0.35)' }         // error — extra
+];
+
+var NO_DATA_COLOR = { bg: 'repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.03) 5px, rgba(0,0,0,0.03) 10px)', border: 'rgba(107, 143, 113, 0.25)' };
+
+function getBlockColor(block, index) {
+  if (block.noData) return { bg: 'rgba(107, 143, 113, 0.04)', border: 'rgba(107, 143, 113, 0.25)' };
+  var name = (block.shortName || block.name).toLowerCase();
+  if (name === 'setup' || name === 'rest') return BLOCK_COLORS[0];
+  if (name === 'block 1') return BLOCK_COLORS[1];
+  if (name === 'block 2') return BLOCK_COLORS[2];
+  return BLOCK_COLORS[index % BLOCK_COLORS.length];
+}
+
+function buildBlockAnnotations() {
+  var annotations = {};
+  if (!blocksVisible || !zachData || !zachData.blocks) return annotations;
+
+  var step = 30;
+  var labels = chartInstance ? chartInstance.data.labels : [];
+  var maxIdx = labels.length - 1;
+
+  zachData.blocks.forEach(function (block, i) {
+    // Skip blocks entirely before chart data
+    if (block.endSeconds <= 0 && block.noData) {
+      // "No data" block before recording — show as label at x=0
+      var colors = getBlockColor(block, i);
+      annotations['block_label_' + i] = {
+        type: 'label',
+        xValue: labels[0],
+        yValue: 0.95,
+        yScaleID: 'y',
+        yAdjust: -10,
+        content: '\u25C0 ' + (block.shortName || block.name) + ' (no HR data)',
+        font: { size: 10, weight: '500', family: "'Inter', sans-serif", style: 'italic' },
+        color: colors.border,
+        position: { x: 'start', y: 'start' }
+      };
+      return;
+    }
+
+    var colors = getBlockColor(block, i);
+    var startIdx = Math.max(0, Math.round(block.startSeconds / step));
+    var endIdx = Math.min(maxIdx, Math.round(block.endSeconds / step));
+    startIdx = Math.min(startIdx, maxIdx);
+    endIdx = Math.min(endIdx, maxIdx);
+
+    // For blocks that extend past recorded data, clamp to chart end
+    var isPartial = block.noData || block.partialData;
+    var labelText = block.shortName || block.name;
+    if (isPartial && block.endSeconds > zachData.totalTimeSeconds) {
+      labelText += ' (partial HR)';
+    }
+
+    annotations['block_box_' + i] = {
+      type: 'box',
+      xMin: labels[startIdx],
+      xMax: labels[endIdx],
+      backgroundColor: colors.bg,
+      borderColor: colors.border,
+      borderWidth: 1,
+      borderDash: isPartial ? [2, 3] : [4, 3],
+      label: {
+        display: true,
+        content: labelText,
+        position: { x: 'center', y: 'start' },
+        font: { size: 11, weight: isPartial ? '400' : '600', family: "'Inter', sans-serif", style: isPartial ? 'italic' : 'normal' },
+        color: colors.border,
+        padding: 4
+      }
+    };
+  });
+
+  return annotations;
+}
+
+function toggleBlocks() {
+  blocksVisible = !blocksVisible;
+  var btn = document.getElementById('toggle-blocks-btn');
+  btn.classList.toggle('active', blocksVisible);
+  updateChartAnnotations();
+
+  // Show/hide block legend
+  var legend = document.getElementById('block-legend');
+  if (legend) legend.classList.toggle('hidden', !blocksVisible);
 }
 
 // ── Render Chart.js line chart ───────────────────────
@@ -340,6 +491,11 @@ function toggleAllZones() {
 function updateChartAnnotations() {
   if (!chartInstance) return;
   var annotations = buildZoneAnnotations();
+  // Merge block annotations
+  var blockAnnotations = buildBlockAnnotations();
+  Object.keys(blockAnnotations).forEach(function (key) {
+    annotations[key] = blockAnnotations[key];
+  });
   // Preserve selection annotation if present
   if (chartInstance.options.plugins.annotation.annotations.selectionBox) {
     annotations.selectionBox = chartInstance.options.plugins.annotation.annotations.selectionBox;

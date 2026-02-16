@@ -34,6 +34,7 @@
       <div class="chart-controls">
         <button id="reset-zoom-btn" class="btn-small hidden">Reset Zoom</button>
         <button id="select-range-btn" class="btn-small">Select Range</button>
+        <button id="toggle-blocks-btn" class="btn-small hidden">Blocks</button>
         <div class="zone-toggles">
           <button class="zone-pill zone-pill-1" data-zone="0" aria-pressed="false">Z1</button>
           <button class="zone-pill zone-pill-2" data-zone="1" aria-pressed="false">Z2</button>
@@ -49,6 +50,9 @@
       <div class="zone-legend-note">
         <p><strong>HR Zones</strong> — Z1 Recovery (95–114) · Z2 Endurance (114–133) · Z3 Tempo (133–152) · Z4 Threshold (152–171) · Z5 VO2 Max (171–190)</p>
       </div>
+
+      <!-- Block Legend -->
+      <div id="block-legend" class="block-legend hidden"></div>
 
       <!-- Segment Stats Panel -->
       <div id="segment-panel" class="segment-panel hidden" aria-live="polite">
