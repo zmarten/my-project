@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog | Zach Martens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .blog-header {
+      padding: 140px 24px 80px;
+      text-align: center;
+      background: linear-gradient(135deg, var(--cloud-white) 0%, #f0e8e0 50%, var(--mist-light) 100%);
+    }
+
+    .blog-header .hero-greeting {
+      font-size: 1.1rem;
+      color: var(--sage-medium);
+      font-weight: 500;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .blog-header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5vw, 3rem);
+      font-weight: 700;
+      color: var(--forest-deep);
+      margin-bottom: 16px;
+    }
+
+    .blog-header p {
+      font-size: 1.1rem;
+      color: var(--stone-medium);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.75;
+    }
+
+    .blog-posts {
+      padding: 80px 0 96px;
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 28px;
+    }
+
+    .blog-card {
+      background: var(--pure-white);
+      border-radius: 8px;
+      border: 1px solid var(--mist-light);
+      box-shadow: var(--shadow-base);
+      padding: 32px;
+      transition: transform var(--transition), box-shadow var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .blog-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .blog-card-date {
+      font-size: 0.8rem;
+      color: var(--stone-medium);
+      font-family: var(--font-mono);
+    }
+
+    .blog-card-tag {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      background: rgba(45, 90, 74, 0.08);
+      color: var(--moss-main);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .blog-card h2 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--forest-deep);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .blog-card p {
+      color: var(--stone-medium);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      flex: 1;
+      margin-bottom: 24px;
+    }
+
+    .blog-card .btn-small {
+      align-self: flex-start;
+    }
+
+    .blog-empty {
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--stone-medium);
+    }
+
+    .blog-empty p {
+      font-size: 1.05rem;
+      font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+      .blog-header {
+        padding: 110px 20px 60px;
+      }
+
+      .blog-posts {
+        padding: 60px 0 80px;
+      }
+
+      .blog-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">ZM</a>
+    <button class="nav-toggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Blog Header -->
+  <div class="blog-header">
+    <div class="fade-in">
+      <p class="hero-greeting">From the playground</p>
+      <h1>Blog</h1>
+      <p>Notes on building, parenting, product, and whatever else ends up on the page between naps.</p>
+    </div>
+  </div>
+
+  <!-- Posts -->
+  <section class="blog-posts">
+    <div class="container">
+      <div class="blog-grid fade-in">
+
+        <!-- Add posts here. Example structure:
+        <article class="blog-card">
+          <div class="blog-card-meta">
+            <span class="blog-card-date">2026-03-01</span>
+            <span class="blog-card-tag">Reflections</span>
+          </div>
+          <h2>Post Title</h2>
+          <p>Short summary of the post goes here.</p>
+          <a href="posts/post-slug.html" class="btn btn-small btn-outline">Read more</a>
+        </article>
+        -->
+
+        <div class="blog-empty">
+          <p>Posts incoming. Zoey's nap schedule permitting.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2026 Zach Martens. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Fade-in animations
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      },
+      { threshold: 0.15 }
+    );
+    document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+
+    // Mobile nav
+    const navToggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('active');
+      navLinks.classList.toggle('open');
+    });
+    navLinks.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('active');
+        navLinks.classList.remove('open');
+      });
+    });
+  </script>
+</body>
+</html>
