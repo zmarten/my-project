@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hello from the Playground | Zach Martens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .post-header {
+      padding: 140px 24px 64px;
+      text-align: center;
+      background: linear-gradient(135deg, var(--cloud-white) 0%, #f0e8e0 50%, var(--mist-light) 100%);
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .post-meta-date {
+      font-size: 0.85rem;
+      color: var(--stone-medium);
+      font-family: var(--font-mono);
+    }
+
+    .post-meta-tag {
+      font-size: 0.8rem;
+      padding: 4px 12px;
+      background: rgba(45, 90, 74, 0.08);
+      color: var(--moss-main);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .post-header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      font-weight: 700;
+      color: var(--forest-deep);
+      max-width: 680px;
+      margin: 0 auto 16px;
+      line-height: 1.25;
+    }
+
+    .post-subtitle {
+      font-size: 1.1rem;
+      color: var(--stone-medium);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .post-body {
+      padding: 72px 0 96px;
+    }
+
+    .post-content {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .post-content p {
+      font-size: 1.05rem;
+      color: var(--stone-dark);
+      line-height: 1.85;
+      margin-bottom: 28px;
+    }
+
+    .post-content h2 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--forest-deep);
+      margin: 48px 0 16px;
+    }
+
+    .post-nav {
+      border-top: 1px solid var(--mist-light);
+      padding-top: 40px;
+      margin-top: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .post-nav a {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .post-header { padding: 110px 20px 48px; }
+      .post-body { padding: 48px 0 72px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="nav-logo">ZM</a>
+    <button class="nav-toggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../blog.html">Blog</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="post-header">
+    <div class="fade-in">
+      <div class="post-meta">
+        <span class="post-meta-date">March 9, 2026</span>
+        <span class="post-meta-tag">Intro</span>
+      </div>
+      <h1>Hello from the Playground</h1>
+      <p class="post-subtitle">An intro to this site, paternity leave, and why I spent my first two weeks of free time building a website.</p>
+    </div>
+  </div>
+
+  <article class="post-body">
+    <div class="post-content fade-in">
+
+      <p>
+        I&rsquo;m a product manager on paternity leave, and the first two weeks have been
+        consumed entirely by my daughter Zoey. We spend our days working through the ongoing
+        negotiation that is tummy time, sharing smiles, and chatting. She gets that from her mother.
+      </p>
+
+      <h2>So what is this place?</h2>
+
+      <p>
+        Paternity leave means I have a rare and probably unrepeatable window where no one
+        is expecting anything from me professionally. That&rsquo;s a strange feeling after years
+        of roadmaps, sprints, and stakeholder reviews. The instinct to build something
+        didn&rsquo;t go away. It just had nowhere to go.
+      </p>
+
+      <p>
+        So I made somewhere for it to go. This site started as a sandbox where I could
+        tinker without stakes, and it&rsquo;s slowly turned into something I actually want to
+        keep. The <a href="../index.html#projects">projects section</a> is where I&rsquo;m
+        documenting what I build. This blog is where I document what I&rsquo;m thinking.
+      </p>
+
+      <h2>The AI angle</h2>
+
+      <p>
+        Over the last year I had been using AI pretty effectively for individual PM tasks:
+        user story generation, requirement gathering and synthesis, collecting and organizing
+        thoughts. Useful, but incremental. The real shift came when agents entered my
+        workflow alongside the ability to build a central engine that could pull wide context
+        for individual tasks. Suddenly things that used to take a lot of manual assembly
+        just&hellip; happened.
+      </p>
+
+      <p>
+        That became even more apparent when I started using Claude Code. Being able to pull
+        insights across a variety of repos and understand how our team&rsquo;s evolution fit into
+        the broader picture we were drawing was genuinely new. It changed how I thought
+        about my job, not just how I did it.
+      </p>
+
+      <p>
+        I wanted to spend some of my leave exploring that further. Not in a professional
+        capacity (no deliverables, no OKRs), just genuinely poking at things to see what
+        they can do. What&rsquo;s actually impressive and what&rsquo;s hype? What does this mean for
+        how I think about product work when I go back?
+      </p>
+
+      <p>
+        There&rsquo;s also a portfolio angle here. I wanted a place to collect PM-adjacent work
+        I can actually point to. But honestly, this is as much for me as anything else. I
+        have 14 weeks. That&rsquo;s a real window to think, build, and write without the usual
+        noise, and I want to use it well.
+      </p>
+
+      <p>
+        (A quick note of genuine gratitude to Deloitte for the generous paternity leave
+        that makes any of this possible.)
+      </p>
+
+      <p>
+        The plan is to keep notes here as I go. Some posts will be about specific tools
+        or projects. Some will be more half-formed. All of it written between naps, during
+        bottles, and in whatever quiet moments Zoey&rsquo;s schedule allows.
+      </p>
+
+      <p>
+        If you&rsquo;re a PM, a builder, or just someone trying to make sense of where all this
+        is heading, I hope some of it is useful. And if you&rsquo;re just here because you found
+        a link somewhere: hi, I&rsquo;m Zach. Welcome to the playground.
+      </p>
+
+      <div class="post-nav">
+        <a href="../blog.html">&larr; All posts</a>
+      </div>
+
+    </div>
+  </article>
+
+  <footer class="footer">
+    <p>&copy; 2026 Zach Martens. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      },
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+
+    const navToggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('active');
+      navLinks.classList.toggle('open');
+    });
+    navLinks.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('active');
+        navLinks.classList.remove('open');
+      });
+    });
+  </script>
+</body>
+</html>
