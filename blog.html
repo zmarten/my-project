@@ -108,17 +108,6 @@
       align-self: flex-start;
     }
 
-    .blog-empty {
-      text-align: center;
-      padding: 80px 24px;
-      color: var(--stone-medium);
-    }
-
-    .blog-empty p {
-      font-size: 1.05rem;
-      font-style: italic;
-    }
-
     @media (max-width: 768px) {
       .blog-header {
         padding: 110px 20px 60px;
@@ -166,21 +155,15 @@
     <div class="container">
       <div class="blog-grid fade-in">
 
-        <!-- Add posts here. Example structure:
         <article class="blog-card">
           <div class="blog-card-meta">
-            <span class="blog-card-date">2026-03-01</span>
-            <span class="blog-card-tag">Reflections</span>
+            <span class="blog-card-date">March 9, 2026</span>
+            <span class="blog-card-tag">Intro</span>
           </div>
-          <h2>Post Title</h2>
-          <p>Short summary of the post goes here.</p>
-          <a href="posts/post-slug.html" class="btn btn-small btn-outline">Read more</a>
+          <h2>Hello from the Playground</h2>
+          <p>An intro to this site, paternity leave, and why I spent my first two weeks of free time building a website.</p>
+          <a href="posts/hello.html" class="btn btn-small btn-outline">Read more</a>
         </article>
-        -->
-
-        <div class="blog-empty">
-          <p>Posts incoming. Zoey's nap schedule permitting.</p>
-        </div>
 
       </div>
     </div>
@@ -192,7 +175,6 @@
   </footer>
 
   <script>
-    // Fade-in animations
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -203,7 +185,6 @@
     );
     document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
 
-    // Mobile nav
     const navToggle = document.querySelector('.nav-toggle');
     const navLinks = document.querySelector('.nav-links');
     navToggle.addEventListener('click', () => {
