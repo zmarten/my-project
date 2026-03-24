@@ -15,6 +15,7 @@ export default function TasksPanel({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newText, setNewText] = useState("");
   const [newTag, setNewTag] = useState<TaskTag>("new");
+  const [newDate, setNewDate] = useState("");
   const [loading, setLoading] = useState(true);
 
   const fetchTasks = useCallback(async () => {
@@ -42,10 +43,12 @@ export default function TasksPanel({
       text: newText.trim(),
       tag: newTag,
       completed: false,
+      assigned_date: newDate || null,
     });
     if (!error) {
       setNewText("");
       setNewTag("new");
+      setNewDate("");
       fetchTasks();
     }
   };
@@ -63,6 +66,14 @@ export default function TasksPanel({
 
   const deleteTask = async (id: string) => {
     await supabase.from("tasks").delete().eq("id", id);
+    fetchTasks();
+  };
+
+  const setTaskDate = async (task: Task, date: string | null) => {
+    await supabase
+      .from("tasks")
+      .update({ assigned_date: date })
+      .eq("id", task.id);
     fetchTasks();
   };
 
@@ -90,6 +101,7 @@ export default function TasksPanel({
                 task={task}
                 onToggle={() => toggleTask(task)}
                 onDelete={() => deleteTask(task.id)}
+                onDateChange={(date) => setTaskDate(task, date)}
               />
             ))}
 
@@ -108,6 +120,7 @@ export default function TasksPanel({
                     task={task}
                     onToggle={() => toggleTask(task)}
                     onDelete={() => deleteTask(task.id)}
+                    onDateChange={(date) => setTaskDate(task, date)}
                   />
                 ))}
               </>
@@ -117,7 +130,7 @@ export default function TasksPanel({
       </div>
 
       {/* Add task input */}
-      <div className="mt-3 pt-3 border-t border-border">
+      <div className="mt-3 pt-3 border-t border-border space-y-2">
         <div className="flex gap-2">
           <input
             type="text"
@@ -146,6 +159,12 @@ export default function TasksPanel({
             Add
           </button>
         </div>
+        <input
+          type="date"
+          value={newDate}
+          onChange={(e) => setNewDate(e.target.value)}
+          className="w-full bg-bg border border-border rounded-lg px-3 py-1.5 text-xs font-mono text-text-secondary placeholder:text-text-muted focus:outline-none focus:border-accent-green/50 transition-colors"
+        />
       </div>
     </div>
   );
@@ -155,11 +174,23 @@ function TaskRow({
   task,
   onToggle,
   onDelete,
+  onDateChange,
 }: {
   task: Task;
   onToggle: () => void;
   onDelete: () => void;
+  onDateChange: (date: string | null) => void;
 }) {
+  const today = new Date().toISOString().split("T")[0];
+  const isOverdue =
+    task.assigned_date && !task.completed && task.assigned_date < today;
+  const isToday = task.assigned_date === today;
+
+  const formatDate = (d: string) => {
+    const dt = new Date(d + "T12:00:00");
+    return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
   return (
     <div
       className={`flex items-center gap-3 p-2.5 rounded-lg hover:bg-bg-hover transition-colors group ${
@@ -179,6 +210,27 @@ function TaskRow({
       >
         {task.text}
       </span>
+      {task.assigned_date && (
+        <span
+          className={`font-mono text-[10px] px-1.5 py-0.5 rounded ${
+            isOverdue
+              ? "text-accent-red bg-accent-red/10"
+              : isToday
+              ? "text-accent-amber bg-accent-amber/10"
+              : "text-text-muted bg-bg"
+          }`}
+        >
+          {formatDate(task.assigned_date)}
+        </span>
+      )}
+      <input
+        type="date"
+        value={task.assigned_date ?? ""}
+        onChange={(e) => onDateChange(e.target.value || null)}
+        className="opacity-0 group-hover:opacity-100 w-5 h-5 bg-transparent border-none cursor-pointer transition-opacity"
+        title="Set date"
+        style={{ colorScheme: "dark" }}
+      />
       <span className={`tag tag-${task.tag}`}>{task.tag}</span>
       <button
         onClick={onDelete}

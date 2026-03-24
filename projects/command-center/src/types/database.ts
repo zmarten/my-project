@@ -1,5 +1,6 @@
 export type TaskTag = "covey" | "home" | "health" | "deloitte" | "new";
-export type GoalColor = "green" | "amber" | "blue" | "red" | "teal";
+export type GoalCategory = "health" | "family" | "projects" | "financial";
+export type GoalHorizon = 30 | 90 | 180;
 
 export interface Task {
   id: string;
@@ -7,6 +8,7 @@ export interface Task {
   text: string;
   tag: TaskTag;
   completed: boolean;
+  assigned_date: string | null;
   created_at: string;
   completed_at: string | null;
 }
@@ -14,12 +16,26 @@ export interface Task {
 export interface Goal {
   id: string;
   user_id: string;
-  name: string;
+  title: string;
+  category: GoalCategory;
+  horizon: GoalHorizon;
+  due_date: string;
+  success_measure: string | null;
   progress: number;
-  color: GoalColor;
-  due_date: string | null;
-  note: string | null;
+  completed: boolean;
   created_at: string;
+  completed_at: string | null;
+  actions?: GoalAction[];
+}
+
+export interface GoalAction {
+  id: string;
+  goal_id: string;
+  user_id: string;
+  text: string;
+  completed: boolean;
+  created_at: string;
+  completed_at: string | null;
 }
 
 export interface Database {
@@ -27,13 +43,18 @@ export interface Database {
     Tables: {
       tasks: {
         Row: Task;
-        Insert: Omit<Task, "id" | "created_at" | "completed_at">;
+        Insert: Omit<Task, "id" | "created_at" | "completed_at" | "assigned_date"> & { assigned_date?: string | null };
         Update: Partial<Omit<Task, "id" | "user_id">>;
       };
       goals: {
         Row: Goal;
-        Insert: Omit<Goal, "id" | "created_at">;
-        Update: Partial<Omit<Goal, "id" | "user_id">>;
+        Insert: Omit<Goal, "id" | "created_at" | "completed_at" | "actions">;
+        Update: Partial<Omit<Goal, "id" | "user_id" | "actions">>;
+      };
+      goal_actions: {
+        Row: GoalAction;
+        Insert: Omit<GoalAction, "id" | "created_at" | "completed_at">;
+        Update: Partial<Omit<GoalAction, "id" | "user_id" | "goal_id">>;
       };
     };
     Views: Record<string, never>;

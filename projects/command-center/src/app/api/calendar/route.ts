@@ -4,6 +4,10 @@ import { cookies } from "next/headers";
 import { getCalendarClient } from "@/lib/google";
 import type { CalendarEvent } from "@/types";
 
+const CALENDAR_NAME_OVERRIDES: Record<string, string> = {
+  "Amion - Hatch Pediatrics": "Sarah Work Schedule",
+};
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const range = searchParams.get("range") || "today";
@@ -61,25 +65,48 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const calendar = getCalendarClient(session.provider_token);
-    const response = await calendar.events.list({
-      calendarId: "primary",
-      timeMin: timeMin.toISOString(),
-      timeMax: timeMax.toISOString(),
-      singleEvents: true,
-      orderBy: "startTime",
-      maxResults: 50,
-    });
+    const cal = getCalendarClient(session.provider_token);
 
-    const events: CalendarEvent[] = (response.data.items || []).map((item) => ({
-      id: item.id || "",
-      summary: item.summary || "(No title)",
-      start: item.start?.dateTime || item.start?.date || "",
-      end: item.end?.dateTime || item.end?.date || "",
-      allDay: !item.start?.dateTime,
-      location: item.location || undefined,
-      color: item.colorId || undefined,
-    }));
+    // Fetch all calendars the user has access to (primary + shared)
+    const calendarList = await cal.calendarList.list({ minAccessRole: "reader" });
+    const calendars = (calendarList.data.items || []).filter(
+      (c) => c.selected !== false
+    );
+
+    // Fetch events from all calendars in parallel
+    const results = await Promise.allSettled(
+      calendars.map((c) =>
+        cal.events.list({
+          calendarId: c.id!,
+          timeMin: timeMin.toISOString(),
+          timeMax: timeMax.toISOString(),
+          singleEvents: true,
+          orderBy: "startTime",
+          maxResults: 50,
+        }).then((res) => ({ res, calendarName: CALENDAR_NAME_OVERRIDES[c.summary || ""] ?? c.summary ?? "" }))
+      )
+    );
+
+    const events: CalendarEvent[] = [];
+    for (const result of results) {
+      if (result.status !== "fulfilled") continue;
+      const { res, calendarName } = result.value;
+      for (const item of res.data.items || []) {
+        events.push({
+          id: item.id || "",
+          summary: item.summary || "(No title)",
+          start: item.start?.dateTime || item.start?.date || "",
+          end: item.end?.dateTime || item.end?.date || "",
+          allDay: !item.start?.dateTime,
+          location: item.location || undefined,
+          color: item.colorId || undefined,
+          calendarName,
+        });
+      }
+    }
+
+    // Sort by start time
+    events.sort((a, b) => a.start.localeCompare(b.start));
 
     return NextResponse.json(events);
   } catch (error: unknown) {

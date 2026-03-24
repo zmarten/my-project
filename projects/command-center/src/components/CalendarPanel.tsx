@@ -146,6 +146,11 @@ function EventRow({
             {event.location}
           </p>
         )}
+        {event.calendarName && (
+          <p className="text-[10px] font-mono text-text-muted/60 truncate mt-0.5">
+            {event.calendarName}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import type { User, Session, SupabaseClient } from "@supabase/supabase-js";
 interface AuthContext {
   user: User | null;
   session: Session | null;
+  providerToken: string | null;
   supabase: SupabaseClient;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -19,20 +20,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [supabase] = useState(() => createBrowserSupabase());
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [providerToken, setProviderToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.provider_token) {
+        localStorage.setItem("provider_token", session.provider_token);
+        setProviderToken(session.provider_token);
+      } else {
+        const stored = localStorage.getItem("provider_token");
+        setProviderToken(stored);
+      }
       setLoading(false);
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.provider_token) {
+        localStorage.setItem("provider_token", session.provider_token);
+        setProviderToken(session.provider_token);
+      }
+      if (event === "SIGNED_OUT") {
+        localStorage.removeItem("provider_token");
+        setProviderToken(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -55,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, supabase, signIn, signOut, loading }}
+      value={{ user, session, providerToken, supabase, signIn, signOut, loading }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,4 +1,4 @@
-export type { Task, Goal, TaskTag, GoalColor, Database } from "./database";
+export type { Task, Goal, GoalAction, TaskTag, GoalCategory, GoalHorizon, Database } from "./database";
 
 export interface CalendarEvent {
   id: string;
@@ -8,6 +8,7 @@ export interface CalendarEvent {
   color?: string;
   allDay?: boolean;
   location?: string;
+  calendarName?: string;
 }
 
 export interface GmailThread {
