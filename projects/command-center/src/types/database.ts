@@ -9,6 +9,7 @@ export interface Task {
   tag: TaskTag;
   completed: boolean;
   assigned_date: string | null;
+  goal_id: string | null;
   created_at: string;
   completed_at: string | null;
 }
@@ -43,7 +44,7 @@ export interface Database {
     Tables: {
       tasks: {
         Row: Task;
-        Insert: Omit<Task, "id" | "created_at" | "completed_at" | "assigned_date"> & { assigned_date?: string | null };
+        Insert: Omit<Task, "id" | "created_at" | "completed_at" | "assigned_date" | "goal_id"> & { assigned_date?: string | null; goal_id?: string | null };
         Update: Partial<Omit<Task, "id" | "user_id">>;
       };
       goals: {

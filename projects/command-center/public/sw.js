@@ -20,12 +20,17 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Network-first for API calls
+  // Network-first for API calls — never serve from cache, always let the page handle errors
   if (event.request.url.includes("/api/")) {
     event.respondWith(
-      fetch(event.request).catch(() =>
-        caches.match(event.request)
-      )
+      fetch(event.request).catch((err) => {
+        const cached = caches.match(event.request);
+        if (cached) return cached;
+        return new Response(
+          JSON.stringify({ error: "Network unavailable" }),
+          { status: 503, headers: { "Content-Type": "application/json" } }
+        );
+      })
     );
     return;
   }

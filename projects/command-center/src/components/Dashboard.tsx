@@ -9,6 +9,7 @@ import TasksPanel from "./TasksPanel";
 import InboxPanel from "./InboxPanel";
 import GoalsPanel from "./GoalsPanel";
 import GoalsSummary from "./GoalsSummary";
+import WeeklyReviewModal, { shouldShowWeeklyReview } from "./WeeklyReviewModal";
 
 type Tab = "dashboard" | "goals";
 
@@ -19,6 +20,11 @@ export default function Dashboard() {
   const [openTasks, setOpenTasks] = useState(0);
   const [unreadEmails, setUnreadEmails] = useState(0);
   const [goalProgress, setGoalProgress] = useState(0);
+  const [showWeeklyReview, setShowWeeklyReview] = useState(false);
+
+  useEffect(() => {
+    if (shouldShowWeeklyReview()) setShowWeeklyReview(true);
+  }, []);
 
   useEffect(() => {
     fetch("/api/calendar?range=today")
@@ -43,6 +49,9 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen relative z-10">
+      {showWeeklyReview && (
+        <WeeklyReviewModal onClose={() => setShowWeeklyReview(false)} />
+      )}
       {/* Header */}
       <header className="flex items-center justify-between px-4 lg:px-6 py-4">
         <div className="flex items-center gap-6">

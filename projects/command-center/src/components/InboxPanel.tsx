@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth-context";
 import type { GmailThread } from "@/types";
 
 const AVATAR_GRADIENTS = [
@@ -44,8 +45,41 @@ export default function InboxPanel({
 }: {
   onUnreadChange?: (count: number) => void;
 }) {
+  const { supabase, user } = useAuth();
   const [threads, setThreads] = useState<GmailThread[]>([]);
   const [loading, setLoading] = useState(true);
+  const [taskAdded, setTaskAdded] = useState<Record<string, boolean>>({});
+  const [taskAdding, setTaskAdding] = useState<Record<string, boolean>>({});
+
+  const addEmailAsTask = async (thread: GmailThread) => {
+    if (!user || taskAdded[thread.id] || taskAdding[thread.id]) return;
+    setTaskAdding((prev) => ({ ...prev, [thread.id]: true }));
+    try {
+      // Parse via NLP
+      const parseRes = await fetch("/api/tasks/parse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: `${thread.subject} — ${thread.preview}`.slice(0, 200),
+          today: new Date().toISOString().split("T")[0],
+        }),
+      });
+      const parsed = await parseRes.json();
+      await supabase.from("tasks").insert({
+        user_id: user.id,
+        text: parsed.text || thread.subject,
+        tag: parsed.tag || "new",
+        completed: false,
+        assigned_date: parsed.assigned_date || null,
+        goal_id: null,
+      });
+      setTaskAdded((prev) => ({ ...prev, [thread.id]: true }));
+    } catch {
+      setTaskAdded((prev) => ({ ...prev, [thread.id]: false }));
+    } finally {
+      setTaskAdding((prev) => ({ ...prev, [thread.id]: false }));
+    }
+  };
 
   useEffect(() => {
     fetch("/api/gmail")
@@ -82,7 +116,7 @@ export default function InboxPanel({
           threads.map((thread) => (
             <div
               key={thread.id}
-              className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-bg-hover transition-colors cursor-pointer"
+              className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-bg-hover transition-colors group cursor-pointer"
             >
               {/* Avatar */}
               <div
@@ -123,6 +157,30 @@ export default function InboxPanel({
                   {thread.preview}
                 </p>
               </div>
+
+              {/* Email-to-task button */}
+              <button
+                onClick={(e) => { e.stopPropagation(); addEmailAsTask(thread); }}
+                className={`shrink-0 opacity-0 group-hover:opacity-100 transition-all p-1 rounded ${
+                  taskAdded[thread.id]
+                    ? "text-accent-green"
+                    : "text-text-muted hover:text-accent-green hover:bg-accent-green/10"
+                }`}
+                title={taskAdded[thread.id] ? "Task added" : "Add as task"}
+                disabled={taskAdded[thread.id] || taskAdding[thread.id]}
+              >
+                {taskAdding[thread.id] ? (
+                  <span className="w-4 h-4 border border-accent-green/30 border-t-accent-green rounded-full animate-spin block" />
+                ) : taskAdded[thread.id] ? (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                )}
+              </button>
             </div>
           ))
         )}

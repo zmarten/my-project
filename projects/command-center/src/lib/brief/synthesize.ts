@@ -118,8 +118,8 @@ Respond with ONLY valid JSON matching this exact schema. No markdown, no preambl
 
 Rules:
 - focus array must have exactly 4 items
-- timeline should interleave events and tasks chronologically (5-9 items)
-- goal_actions should have one entry per active goal (max 5)
+- timeline should interleave events and tasks chronologically (5-9 items). Tasks that have a linked_goal field should be called out with the goal context in the detail field.
+- goal_actions should have one entry per active goal (max 5). If a task is linked to a goal, reference it as a specific today action.
 - intel should have 3-5 items of genuinely relevant news
 - timeline colors: green=fitness, blue=appointments/health, amber=work/projects, teal=outdoor, red=urgent
 - Do NOT include any text outside the JSON object`;
@@ -136,7 +136,14 @@ ${data.date} (${data.dayOfWeek})
 ${JSON.stringify(data.calendar, null, 2)}
 
 ## Tasks (open and recent)
-${JSON.stringify(data.tasks, null, 2)}
+${JSON.stringify(
+  data.tasks.map((t) => ({
+    ...t,
+    ...(t.goal_title ? { linked_goal: t.goal_title } : {}),
+  })),
+  null,
+  2
+)}
 
 ## Active Goals
 ${JSON.stringify(data.goals, null, 2)}

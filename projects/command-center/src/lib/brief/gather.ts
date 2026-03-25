@@ -31,6 +31,8 @@ export interface BriefTask {
   completed: boolean;
   assigned_date: string | null;
   created_at: string;
+  goal_id: string | null;
+  goal_title?: string;
 }
 
 export interface BriefGoal {
@@ -160,14 +162,32 @@ async function fetchTasks(userId: string): Promise<BriefTask[]> {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const { data } = await supabase
+  const { data: tasks } = await supabase
     .from("tasks")
-    .select("id, text, tag, completed, assigned_date, created_at")
+    .select("id, text, tag, completed, assigned_date, created_at, goal_id")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(30);
 
-  return data || [];
+  if (!tasks || tasks.length === 0) return [];
+
+  // Resolve goal titles for linked tasks
+  const goalIds = Array.from(new Set(tasks.map((t) => t.goal_id).filter(Boolean))) as string[];
+  let goalMap: Record<string, string> = {};
+  if (goalIds.length > 0) {
+    const { data: goals } = await supabase
+      .from("goals")
+      .select("id, title")
+      .in("id", goalIds);
+    for (const g of goals || []) {
+      goalMap[g.id] = g.title;
+    }
+  }
+
+  return tasks.map((t) => ({
+    ...t,
+    goal_title: t.goal_id ? goalMap[t.goal_id] : undefined,
+  }));
 }
 
 async function fetchGoals(userId: string): Promise<BriefGoal[]> {

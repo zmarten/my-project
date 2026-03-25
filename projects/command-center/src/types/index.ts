@@ -11,6 +11,13 @@ export interface CalendarEvent {
   calendarName?: string;
 }
 
+export interface BrainSuggestion {
+  action: string;
+  source_summary: string | null;
+  thought_id: string;
+  created_at: string;
+}
+
 export interface GmailThread {
   id: string;
   subject: string;
