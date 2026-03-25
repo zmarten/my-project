@@ -118,7 +118,6 @@ async function fetchCalendarEvents(
   const calendars = (calendarList.data.items || [])
     .filter((c) => c.selected !== false && c.id);
 
-  console.log("[brief] calendars found:", calendars.map((c) => `${c.summary} (${c.id})`));
 
   // Fetch events from all calendars in parallel
   const results = await Promise.allSettled(

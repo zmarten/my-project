@@ -93,9 +93,7 @@ export async function GET(request: NextRequest) {
       date: today,
     });
   } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Failed to generate brief";
     console.error("Brief generation error:", error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Failed to generate brief" }, { status: 500 });
   }
 }
