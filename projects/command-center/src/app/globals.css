@@ -5,14 +5,37 @@
 :root {
   --bg: #0a0f0d;
   --bg-card: #111916;
+  --bg-hover: #162016;
   --accent-green: #4ade80;
   --accent-teal: #2dd4bf;
   --accent-amber: #f59e0b;
   --accent-red: #ef4444;
   --accent-blue: #60a5fa;
   --border: #1e2e24;
+  --border-hover: #2a3f30;
   --text-primary: #e2e8e4;
   --text-secondary: #8b9e8f;
+  --text-muted: #5a6e5e;
+}
+
+/* Global focus ring for keyboard navigation */
+:focus-visible {
+  outline: 2px solid #4ade80;
+  outline-offset: 2px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 * {
@@ -38,21 +61,21 @@ body::before {
   pointer-events: none;
   opacity: 0.04;
   background-image:
-    radial-gradient(ellipse 600px 600px at 20% 30%, transparent 59%, #4ade80 60%, transparent 61%),
-    radial-gradient(ellipse 500px 400px at 70% 20%, transparent 59%, #4ade80 60%, transparent 61%),
-    radial-gradient(ellipse 800px 500px at 50% 60%, transparent 59%, #2dd4bf 60%, transparent 61%),
-    radial-gradient(ellipse 400px 300px at 80% 70%, transparent 59%, #4ade80 60%, transparent 61%),
-    radial-gradient(ellipse 700px 450px at 30% 80%, transparent 59%, #2dd4bf 60%, transparent 61%),
-    radial-gradient(ellipse 550px 550px at 20% 30%, transparent 49%, #4ade80 50%, transparent 51%),
-    radial-gradient(ellipse 450px 350px at 70% 20%, transparent 49%, #4ade80 50%, transparent 51%),
-    radial-gradient(ellipse 750px 450px at 50% 60%, transparent 49%, #2dd4bf 50%, transparent 51%),
-    radial-gradient(ellipse 350px 250px at 80% 70%, transparent 49%, #4ade80 50%, transparent 51%),
-    radial-gradient(ellipse 650px 400px at 30% 80%, transparent 49%, #2dd4bf 50%, transparent 51%),
-    radial-gradient(ellipse 500px 500px at 20% 30%, transparent 39%, #4ade80 40%, transparent 41%),
-    radial-gradient(ellipse 400px 300px at 70% 20%, transparent 39%, #4ade80 40%, transparent 41%),
-    radial-gradient(ellipse 700px 400px at 50% 60%, transparent 39%, #2dd4bf 40%, transparent 41%),
-    radial-gradient(ellipse 300px 200px at 80% 70%, transparent 39%, #4ade80 40%, transparent 41%),
-    radial-gradient(ellipse 600px 350px at 30% 80%, transparent 39%, #2dd4bf 40%, transparent 41%);
+    radial-gradient(ellipse 600px 600px at 20% 30%, transparent 59%, var(--accent-green) 60%, transparent 61%),
+    radial-gradient(ellipse 500px 400px at 70% 20%, transparent 59%, var(--accent-green) 60%, transparent 61%),
+    radial-gradient(ellipse 800px 500px at 50% 60%, transparent 59%, var(--accent-teal) 60%, transparent 61%),
+    radial-gradient(ellipse 400px 300px at 80% 70%, transparent 59%, var(--accent-green) 60%, transparent 61%),
+    radial-gradient(ellipse 700px 450px at 30% 80%, transparent 59%, var(--accent-teal) 60%, transparent 61%),
+    radial-gradient(ellipse 550px 550px at 20% 30%, transparent 49%, var(--accent-green) 50%, transparent 51%),
+    radial-gradient(ellipse 450px 350px at 70% 20%, transparent 49%, var(--accent-green) 50%, transparent 51%),
+    radial-gradient(ellipse 750px 450px at 50% 60%, transparent 49%, var(--accent-teal) 50%, transparent 51%),
+    radial-gradient(ellipse 350px 250px at 80% 70%, transparent 49%, var(--accent-green) 50%, transparent 51%),
+    radial-gradient(ellipse 650px 400px at 30% 80%, transparent 49%, var(--accent-teal) 50%, transparent 51%),
+    radial-gradient(ellipse 500px 500px at 20% 30%, transparent 39%, var(--accent-green) 40%, transparent 41%),
+    radial-gradient(ellipse 400px 300px at 70% 20%, transparent 39%, var(--accent-green) 40%, transparent 41%),
+    radial-gradient(ellipse 700px 400px at 50% 60%, transparent 39%, var(--accent-teal) 40%, transparent 41%),
+    radial-gradient(ellipse 300px 200px at 80% 70%, transparent 39%, var(--accent-green) 40%, transparent 41%),
+    radial-gradient(ellipse 600px 350px at 30% 80%, transparent 39%, var(--accent-teal) 40%, transparent 41%);
 }
 
 /* Scrollbar */
@@ -63,11 +86,11 @@ body::before {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e2e24;
+  background: var(--border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2a3f30;
+  background: var(--border-hover);
 }
 
 /* Panel card base */

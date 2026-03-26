@@ -4,11 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import type { Goal, GoalAction, GoalCategory } from "@/types";
 
-const CATEGORY_META: Record<GoalCategory, { label: string; color: string }> = {
-  health: { label: "Health & Fitness", color: "#4ade80" },
-  family: { label: "Family & Parenting", color: "#60a5fa" },
-  projects: { label: "AI & Side Projects", color: "#f59e0b" },
-  financial: { label: "Financial & Home", color: "#2dd4bf" },
+const CATEGORY_META: Record<GoalCategory, { label: string; text: string; fill: string }> = {
+  health: { label: "Health & Fitness", text: "text-accent-green", fill: "bg-accent-green" },
+  family: { label: "Family & Parenting", text: "text-accent-blue", fill: "bg-accent-blue" },
+  projects: { label: "AI & Side Projects", text: "text-accent-amber", fill: "bg-accent-amber" },
+  financial: { label: "Financial & Home", text: "text-accent-teal", fill: "bg-accent-teal" },
 };
 
 
@@ -55,16 +55,22 @@ export default function GoalsSummary({
     });
 
     setGoals(enriched);
-    if (enriched.length > 0) {
-      const avg = Math.round(enriched.reduce((s, g) => s + g.progress, 0) / enriched.length);
-      onProgressChange?.(avg);
-    }
     setLoading(false);
-  }, [user, supabase, onProgressChange]);
+  }, [user, supabase]);
 
   useEffect(() => {
     fetchGoals();
   }, [fetchGoals]);
+
+  // Report progress separately to avoid infinite loop
+  useEffect(() => {
+    if (goals.length > 0) {
+      const avg = Math.round(goals.reduce((s, g) => s + g.progress, 0) / goals.length);
+      onProgressChange?.(avg);
+    } else {
+      onProgressChange?.(0);
+    }
+  }, [goals, onProgressChange]);
 
   // Calculate per-category stats
   const categoryStats = (Object.keys(CATEGORY_META) as GoalCategory[]).map((cat) => {
@@ -110,7 +116,7 @@ export default function GoalsSummary({
               <div key={s.cat}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-medium">{s.label}</span>
-                  <span className="text-xs font-mono" style={{ color: s.color }}>
+                  <span className={`text-xs font-mono ${s.text}`}>
                     {s.avg}%
                     <span className="text-text-muted ml-1">
                       ({s.completed}/{s.total})
@@ -119,8 +125,8 @@ export default function GoalsSummary({
                 </div>
                 <div className="progress-bar">
                   <div
-                    className="progress-fill"
-                    style={{ width: `${s.avg}%`, backgroundColor: s.color }}
+                    className={`progress-fill ${s.fill}`}
+                    style={{ width: `${s.avg}%` }}
                   />
                 </div>
               </div>
@@ -143,8 +149,7 @@ export default function GoalsSummary({
                     className="flex items-start gap-2 py-1.5 px-2 rounded-lg hover:bg-bg-hover transition-colors"
                   >
                     <div
-                      className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
-                      style={{ backgroundColor: CATEGORY_META[action.category].color }}
+                      className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${CATEGORY_META[action.category].fill}`}
                     />
                     <div className="min-w-0">
                       <p className="text-xs text-text-primary">{action.text}</p>

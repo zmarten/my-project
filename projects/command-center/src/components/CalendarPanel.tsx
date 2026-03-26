@@ -11,12 +11,12 @@ const RANGE_MAP: Record<string, string> = {
 };
 
 const EVENT_COLORS = [
-  "#4ade80",
-  "#2dd4bf",
-  "#60a5fa",
-  "#f59e0b",
-  "#ef4444",
-  "#a78bfa",
+  "bg-accent-green",
+  "bg-accent-teal",
+  "bg-accent-blue",
+  "bg-accent-amber",
+  "bg-accent-red",
+  "bg-purple-400",
 ];
 
 function formatTime(dateStr: string, allDay?: boolean): string {
@@ -38,22 +38,38 @@ function formatDateHeader(dateStr: string): string {
   });
 }
 
-export default function CalendarPanel() {
+export default function CalendarPanel({
+  onEventCountChange,
+}: {
+  onEventCountChange?: (count: number) => void;
+}) {
   const [activeTab, setActiveTab] = useState<string>("Today");
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     fetch(`/api/calendar?range=${RANGE_MAP[activeTab]}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setEvents(data);
-        else setEvents([]);
+      .then((r) => {
+        if (!r.ok) throw new Error(r.status === 401 ? "Session expired — please sign out and back in" : "Failed to load calendar");
+        return r.json();
       })
-      .catch(() => setEvents([]))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setEvents(data);
+          if (activeTab === "Today") onEventCountChange?.(data.length);
+        } else {
+          setEvents([]);
+        }
+      })
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [activeTab]);
+    // onEventCountChange is a stable useCallback from parent — excluded to avoid unnecessary refetches
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, retryCount]);
 
   // Group events by date for week view
   const grouped: Record<string, CalendarEvent[]> = {};
@@ -67,10 +83,12 @@ export default function CalendarPanel() {
     <div className="panel flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display text-lg font-semibold">Calendar</h2>
-        <div className="flex gap-1 bg-bg rounded-lg p-0.5">
+        <div className="flex gap-1 bg-bg rounded-lg p-0.5" role="tablist" aria-label="Calendar range">
           {TABS.map((tab) => (
             <button
               key={tab}
+              role="tab"
+              aria-selected={activeTab === tab}
               onClick={() => setActiveTab(tab)}
               className={`text-xs px-3 py-1.5 rounded-md transition-colors ${
                 activeTab === tab
@@ -85,9 +103,15 @@ export default function CalendarPanel() {
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-1 min-h-0">
-        {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="w-5 h-5 border-2 border-accent-green/30 border-t-accent-green rounded-full animate-spin" />
+        {error ? (
+          <div className="text-center py-8">
+            <p className="text-sm text-accent-red mb-2">{error}</p>
+            <button onClick={() => setRetryCount((c) => c + 1)} className="text-xs text-accent-green hover:text-accent-green/80 transition-colors">Retry</button>
+          </div>
+        ) : loading ? (
+          <div className="flex items-center justify-center py-8" role="status" aria-label="Loading calendar">
+            <div className="w-5 h-5 border-2 border-accent-green/30 border-t-accent-green rounded-full animate-spin" aria-hidden="true" />
+            <span className="sr-only">Loading</span>
           </div>
         ) : events.length === 0 ? (
           <p className="text-text-muted text-sm text-center py-8">
@@ -132,8 +156,8 @@ function EventRow({
   return (
     <div className="flex items-stretch gap-3 p-2.5 rounded-lg hover:bg-bg-hover transition-colors group">
       <div
-        className="w-1 rounded-full shrink-0"
-        style={{ backgroundColor: color }}
+        className={`w-1 rounded-full shrink-0 ${color}`}
+        aria-hidden="true"
       />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium truncate">{event.summary}</p>

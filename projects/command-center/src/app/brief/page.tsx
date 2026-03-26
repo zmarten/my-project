@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AuthProvider, useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/lib/auth-context";
 import type { DailyBrief } from "@/lib/brief/synthesize";
 import BriefSkeleton from "@/components/brief/BriefSkeleton";
 import BriefError from "@/components/brief/BriefError";
@@ -24,21 +24,11 @@ interface BriefResponse {
 }
 
 export default function BriefPage() {
-  return (
-    <AuthProvider>
-      <BriefContent />
-    </AuthProvider>
-  );
-}
-
-function BriefContent() {
-  const { loading: authLoading, providerToken } = useAuth();
+  const { loading: authLoading } = useAuth();
   const [data, setData] = useState<BriefResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
-  const providerTokenRef = useRef(providerToken);
-  useEffect(() => { providerTokenRef.current = providerToken; }, [providerToken]);
 
   const fetchBrief = async (refresh = false) => {
     if (refresh) setRegenerating(true);
@@ -47,12 +37,7 @@ function BriefContent() {
 
     try {
       const url = `/api/brief${refresh ? "?refresh=true" : ""}`;
-      const headers: Record<string, string> = {};
-      const token = providerTokenRef.current;
-      if (token) {
-        headers["x-provider-token"] = token;
-      }
-      const res = await fetch(url, { headers });
+      const res = await fetch(url);
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -96,7 +81,7 @@ function BriefContent() {
   return (
     <div className="min-h-screen relative z-10">
       {/* Nav bar */}
-      <header className="flex items-center justify-between px-4 lg:px-6 py-4 max-w-[720px] mx-auto">
+      <nav aria-label="Brief navigation" className="flex items-center justify-between px-4 lg:px-6 py-4 max-w-[720px] mx-auto">
         <Link
           href="/"
           className="flex items-center gap-2 text-text-muted hover:text-accent-green transition-colors group"
@@ -120,9 +105,9 @@ function BriefContent() {
             {regenerating ? "Generating…" : "↻ Regenerate"}
           </button>
         </div>
-      </header>
+      </nav>
 
-      <main className="max-w-[720px] mx-auto px-5 pb-16 relative z-10">
+      <main id="main-content" className="max-w-[720px] mx-auto px-5 pb-16 relative z-10">
         <Masthead
           date={date}
           dayOfWeek={dayOfWeek}

@@ -12,11 +12,11 @@ const CATEGORIES: { key: GoalCategory | "all"; label: string }[] = [
   { key: "financial", label: "Financial" },
 ];
 
-const CATEGORY_COLORS: Record<GoalCategory, string> = {
-  health: "#4ade80",
-  family: "#60a5fa",
-  projects: "#f59e0b",
-  financial: "#2dd4bf",
+const CATEGORY_COLORS: Record<GoalCategory, { bg: string; text: string; fill: string }> = {
+  health: { bg: "bg-accent-green/15", text: "text-accent-green", fill: "bg-accent-green" },
+  family: { bg: "bg-accent-blue/15", text: "text-accent-blue", fill: "bg-accent-blue" },
+  projects: { bg: "bg-accent-amber/15", text: "text-accent-amber", fill: "bg-accent-amber" },
+  financial: { bg: "bg-accent-teal/15", text: "text-accent-teal", fill: "bg-accent-teal" },
 };
 
 const HORIZON_LABELS: Record<number, string> = {
@@ -107,20 +107,22 @@ export default function GoalsPanel({
     });
 
     setGoals(enriched);
-
-    if (enriched.length > 0) {
-      const avg = Math.round(enriched.reduce((s, g) => s + g.progress, 0) / enriched.length);
-      onProgressChange?.(avg);
-    } else {
-      onProgressChange?.(0);
-    }
-
     setLoading(false);
-  }, [user, supabase, onProgressChange]);
+  }, [user, supabase]);
 
   useEffect(() => {
     fetchGoals();
   }, [fetchGoals]);
+
+  // Report progress separately to avoid infinite loop
+  useEffect(() => {
+    if (goals.length > 0) {
+      const avg = Math.round(goals.reduce((s, g) => s + g.progress, 0) / goals.length);
+      onProgressChange?.(avg);
+    } else {
+      onProgressChange?.(0);
+    }
+  }, [goals, onProgressChange]);
 
   const toggleAction = async (action: GoalAction) => {
     await supabase
@@ -212,14 +214,9 @@ export default function GoalsPanel({
               activeCategory === cat.key
                 ? cat.key === "all"
                   ? "bg-white/10 text-text-primary"
-                  : ""
+                  : `${CATEGORY_COLORS[cat.key as GoalCategory].bg} ${CATEGORY_COLORS[cat.key as GoalCategory].text}`
                 : "text-text-secondary hover:text-text-primary"
             }`}
-            style={
-              activeCategory === cat.key && cat.key !== "all"
-                ? { backgroundColor: `${CATEGORY_COLORS[cat.key as GoalCategory]}20`, color: CATEGORY_COLORS[cat.key as GoalCategory] }
-                : undefined
-            }
           >
             {cat.label}
           </button>
@@ -366,12 +363,20 @@ function GoalRow({
   onCancelEdit: () => void;
   onDelete: () => void;
 }) {
-  const color = CATEGORY_COLORS[goal.category];
+  const colorClasses = CATEGORY_COLORS[goal.category];
   const actions = goal.actions || [];
   const completedActions = actions.filter((a) => a.completed).length;
   const [editTitle, setEditTitle] = useState(goal.title);
   const [editMeasure, setEditMeasure] = useState(goal.success_measure || "");
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  // Reset edit state when entering edit mode or when goal data changes
+  useEffect(() => {
+    if (editing) {
+      setEditTitle(goal.title);
+      setEditMeasure(goal.success_measure || "");
+    }
+  }, [editing, goal.title, goal.success_measure]);
 
   return (
     <div className="rounded-lg hover:bg-bg-hover transition-colors">
@@ -381,8 +386,7 @@ function GoalRow({
         onClick={onToggleExpand}
       >
         <div
-          className="w-1.5 self-stretch rounded-full shrink-0"
-          style={{ backgroundColor: color }}
+          className={`w-1.5 self-stretch rounded-full shrink-0 ${colorClasses.fill}`}
         />
         <div className="flex-1 min-w-0">
           <span className={`text-sm font-medium ${goal.completed ? "line-through text-text-muted" : ""}`}>
@@ -391,11 +395,11 @@ function GoalRow({
           <div className="flex items-center gap-2 mt-1">
             <div className="progress-bar flex-1 max-w-[120px]">
               <div
-                className="progress-fill"
-                style={{ width: `${goal.progress}%`, backgroundColor: color }}
+                className={`progress-fill ${colorClasses.fill}`}
+                style={{ width: `${goal.progress}%` }}
               />
             </div>
-            <span className="text-xs font-mono" style={{ color }}>
+            <span className={`text-xs font-mono ${colorClasses.text}`}>
               {actions.length > 0 ? `${completedActions}/${actions.length}` : `${goal.progress}%`}
             </span>
             <span className={`text-xs font-mono ${dueUrgency(goal.due_date)}`}>
@@ -477,7 +481,8 @@ function GoalRow({
                 </span>
                 <button
                   onClick={() => onDeleteAction(action.id)}
-                  className="opacity-0 group-hover:opacity-100 text-text-muted hover:text-accent-red transition-all"
+                  className="sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 text-text-muted hover:text-accent-red transition-[color,opacity]"
+                  aria-label="Delete action"
                 >
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

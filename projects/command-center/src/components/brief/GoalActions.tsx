@@ -51,7 +51,7 @@ export default function GoalActions({ items }: GoalActionsProps) {
               {item.why}
             </div>
             <div className="flex items-center gap-2 mt-2">
-              <div className="flex-1 h-1 bg-[#1a231e] rounded-full overflow-hidden">
+              <div className="flex-1 h-1 bg-border rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full ${barFill[item.color] ?? "bg-accent-green"}`}
                   style={{ width: `${item.progress}%` }}

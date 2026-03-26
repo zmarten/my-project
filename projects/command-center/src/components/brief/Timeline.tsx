@@ -30,8 +30,7 @@ export default function Timeline({ items }: TimelineProps) {
       {items.map((item, i) => (
         <div
           key={`${item.time}-${item.title}-${i}`}
-          className="grid gap-3.5 py-2.5 px-2 -mx-2 rounded-lg hover:bg-accent-green/[0.03] transition-colors"
-          style={{ gridTemplateColumns: "62px 4px 1fr" }}
+          className="grid grid-cols-[62px_4px_1fr] gap-3.5 py-2.5 px-2 -mx-2 rounded-lg hover:bg-accent-green/[0.03] transition-colors"
         >
           <div className="font-mono text-[12px] text-text-muted pt-0.5 text-right">
             {item.time}

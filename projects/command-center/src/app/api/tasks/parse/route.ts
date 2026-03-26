@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { getApiSession } from "@/lib/api-auth";
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic();
+let _client: Anthropic | null = null;
+function getClient() {
+  if (!_client) _client = new Anthropic();
+  return _client;
+}
 
 const TAG_OPTIONS = ["covey", "home", "health", "deloitte", "new"] as const;
 type TaskTag = (typeof TAG_OPTIONS)[number];
@@ -15,25 +18,7 @@ interface ParsedTask {
 }
 
 export async function POST(request: NextRequest) {
-  const cookieStore = cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll(); },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {}
-        },
-      },
-    }
-  );
-
-  const { data: { session } } = await supabase.auth.getSession();
+  const session = await getApiSession();
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -59,7 +44,7 @@ export async function POST(request: NextRequest) {
 
   let message;
   try {
-    message = await client.messages.create({
+    message = await getClient().messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 256,
       system: `You parse natural language task input into structured task data. Today is ${todayStr} (${todayDayName}).

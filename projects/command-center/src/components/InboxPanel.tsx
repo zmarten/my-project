@@ -5,12 +5,12 @@ import { useAuth } from "@/lib/auth-context";
 import type { GmailThread } from "@/types";
 
 const AVATAR_GRADIENTS = [
-  "from-green-500 to-teal-500",
-  "from-blue-500 to-purple-500",
-  "from-amber-500 to-red-500",
-  "from-teal-500 to-blue-500",
-  "from-purple-500 to-pink-500",
-  "from-red-500 to-amber-500",
+  "from-accent-green to-accent-teal",
+  "from-accent-blue to-accent-teal",
+  "from-accent-amber to-accent-red",
+  "from-accent-teal to-accent-blue",
+  "from-accent-green to-accent-blue",
+  "from-accent-red to-accent-amber",
 ];
 
 function getInitials(name: string): string {
@@ -48,6 +48,7 @@ export default function InboxPanel({
   const { supabase, user } = useAuth();
   const [threads, setThreads] = useState<GmailThread[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [taskAdded, setTaskAdded] = useState<Record<string, boolean>>({});
   const [taskAdding, setTaskAdding] = useState<Record<string, boolean>>({});
 
@@ -81,17 +82,29 @@ export default function InboxPanel({
     }
   };
 
-  useEffect(() => {
+  const fetchInbox = () => {
+    setLoading(true);
+    setError(null);
     fetch("/api/gmail")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(r.status === 401 ? "Session expired" : "Failed to load inbox");
+        return r.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) {
           setThreads(data);
           onUnreadChange?.(data.filter((t) => t.unread).length);
         }
       })
-      .catch(() => setThreads([]))
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : "Failed to load emails");
+        setThreads([]);
+      })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchInbox();
     // onUnreadChange is intentionally excluded — it's a stable callback from parent
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -106,7 +119,12 @@ export default function InboxPanel({
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0 space-y-1">
-        {loading ? (
+        {error ? (
+          <div className="text-center py-8">
+            <p className="text-sm text-accent-red mb-2">{error}</p>
+            <button onClick={fetchInbox} className="text-xs text-accent-green hover:text-accent-green/80 transition-colors">Retry</button>
+          </div>
+        ) : loading ? (
           <div className="flex items-center justify-center py-8">
             <div className="w-5 h-5 border-2 border-accent-red/30 border-t-accent-red rounded-full animate-spin" />
           </div>
@@ -163,7 +181,7 @@ export default function InboxPanel({
               {/* Email-to-task button */}
               <button
                 onClick={(e) => { e.stopPropagation(); addEmailAsTask(thread); }}
-                className={`shrink-0 opacity-0 group-hover:opacity-100 transition-all p-1 rounded ${
+                className={`shrink-0 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-[color,opacity] p-1 rounded ${
                   taskAdded[thread.id]
                     ? "text-accent-green"
                     : "text-text-muted hover:text-accent-green hover:bg-accent-green/10"

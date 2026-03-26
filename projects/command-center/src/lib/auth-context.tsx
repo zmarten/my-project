@@ -16,6 +16,28 @@ interface AuthContext {
 
 const AuthContext = createContext<AuthContext | null>(null);
 
+const TOKEN_KEY = "provider_token";
+const TOKEN_TS_KEY = "provider_token_ts";
+const TOKEN_MAX_AGE_MS = 55 * 60 * 1000; // 55 minutes (buffer before 1hr expiry)
+
+function storeProviderToken(token: string) {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(TOKEN_TS_KEY, Date.now().toString());
+}
+
+function loadProviderToken(): string | null {
+  const stored = localStorage.getItem(TOKEN_KEY);
+  const storedTs = localStorage.getItem(TOKEN_TS_KEY);
+  const isValid =
+    stored && storedTs && Date.now() - parseInt(storedTs) < TOKEN_MAX_AGE_MS;
+  return isValid ? stored : null;
+}
+
+function clearProviderToken() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(TOKEN_TS_KEY);
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [supabase] = useState(() => createBrowserSupabase());
   const [user, setUser] = useState<User | null>(null);
@@ -28,11 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.provider_token) {
-        localStorage.setItem("provider_token", session.provider_token);
+        storeProviderToken(session.provider_token);
         setProviderToken(session.provider_token);
       } else {
-        const stored = localStorage.getItem("provider_token");
-        setProviderToken(stored);
+        setProviderToken(loadProviderToken());
       }
       setLoading(false);
     });
@@ -43,11 +64,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.provider_token) {
-        localStorage.setItem("provider_token", session.provider_token);
+        storeProviderToken(session.provider_token);
         setProviderToken(session.provider_token);
       }
       if (event === "SIGNED_OUT") {
-        localStorage.removeItem("provider_token");
+        clearProviderToken();
         setProviderToken(null);
       }
     });

@@ -20,7 +20,7 @@ export default function IntelFeed({ items }: IntelFeedProps) {
           <div className="flex items-center gap-1.5 font-mono text-[9px] tracking-[0.08em] uppercase text-text-muted mb-1">
             <span className="w-1 h-1 rounded-full bg-accent-teal inline-block" />
             {item.source}
-            <span className="text-[#2a3530]">·</span>
+            <span className="text-text-muted">·</span>
             {item.category}
           </div>
           <div className="text-[14px] font-medium leading-snug text-text-primary mb-1">

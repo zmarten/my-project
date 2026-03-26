@@ -1,42 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
+import { getApiSession } from "@/lib/api-auth";
 import { gatherBriefData } from "@/lib/brief/gather";
 import { synthesizeBrief } from "@/lib/brief/synthesize";
 
 export async function GET(request: NextRequest) {
-  const cookieStore = cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {}
-        },
-      },
-    }
-  );
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const session = await getApiSession();
 
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  // provider_token is dropped from the cookie on session refresh — prefer client-supplied header
-  const providerToken =
-    request.headers.get("x-provider-token") ?? session.provider_token;
+  const providerToken = session.provider_token;
 
   if (!providerToken) {
     return NextResponse.json(

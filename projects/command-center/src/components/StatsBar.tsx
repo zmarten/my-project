@@ -10,21 +10,22 @@ interface StatsBarProps {
 function StatCard({
   label,
   value,
-  color,
+  bgClass,
+  textClass,
   icon,
 }: {
   label: string;
   value: string | number;
-  color: string;
+  bgClass: string;
+  textClass: string;
   icon: React.ReactNode;
 }) {
   return (
     <div className="panel flex items-center gap-3 min-w-0">
       <div
-        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-        style={{ backgroundColor: `${color}15` }}
+        className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${bgClass}`}
       >
-        <span style={{ color }}>{icon}</span>
+        <span className={textClass}>{icon}</span>
       </div>
       <div className="min-w-0">
         <p className="text-2xl font-display font-semibold leading-tight">{value}</p>
@@ -45,7 +46,8 @@ export default function StatsBar({
       <StatCard
         label="Today's Events"
         value={eventCount}
-        color="#4ade80"
+        bgClass="bg-accent-green/10"
+        textClass="text-accent-green"
         icon={
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -55,7 +57,8 @@ export default function StatsBar({
       <StatCard
         label="Open Tasks"
         value={openTasks}
-        color="#f59e0b"
+        bgClass="bg-accent-amber/10"
+        textClass="text-accent-amber"
         icon={
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -65,7 +68,8 @@ export default function StatsBar({
       <StatCard
         label="Priority Emails"
         value={unreadEmails}
-        color="#ef4444"
+        bgClass="bg-accent-red/10"
+        textClass="text-accent-red"
         icon={
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -75,7 +79,8 @@ export default function StatsBar({
       <StatCard
         label="Goal Progress"
         value={`${goalProgress}%`}
-        color="#2dd4bf"
+        bgClass="bg-accent-teal/10"
+        textClass="text-accent-teal"
         icon={
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />

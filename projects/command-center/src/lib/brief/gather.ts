@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getCalendarClient, getGmailClient } from "@/lib/google";
 
 const CALENDAR_NAME_OVERRIDES: Record<string, string> = {
@@ -82,11 +82,17 @@ export async function gatherBriefData(
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
 
+  // Share a single Supabase service client across DB fetches
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
   const [calendar, tasks, goals, emails, weather, news] =
     await Promise.allSettled([
       fetchCalendarEvents(accessToken, today),
-      fetchTasks(userId),
-      fetchGoals(userId),
+      fetchTasks(userId, supabase),
+      fetchGoals(userId, supabase),
       fetchPriorityEmails(accessToken),
       fetchWeather(),
       fetchRelevantNews(),
@@ -156,12 +162,7 @@ async function fetchCalendarEvents(
   return allEvents.sort((a, b) => a.start.localeCompare(b.start));
 }
 
-async function fetchTasks(userId: string): Promise<BriefTask[]> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
+async function fetchTasks(userId: string, supabase: SupabaseClient): Promise<BriefTask[]> {
   const { data: tasks } = await supabase
     .from("tasks")
     .select("id, text, tag, completed, assigned_date, created_at, goal_id")
@@ -173,7 +174,7 @@ async function fetchTasks(userId: string): Promise<BriefTask[]> {
 
   // Resolve goal titles for linked tasks
   const goalIds = Array.from(new Set(tasks.map((t) => t.goal_id).filter(Boolean))) as string[];
-  let goalMap: Record<string, string> = {};
+  const goalMap: Record<string, string> = {};
   if (goalIds.length > 0) {
     const { data: goals } = await supabase
       .from("goals")
@@ -190,12 +191,7 @@ async function fetchTasks(userId: string): Promise<BriefTask[]> {
   }));
 }
 
-async function fetchGoals(userId: string): Promise<BriefGoal[]> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
+async function fetchGoals(userId: string, supabase: SupabaseClient): Promise<BriefGoal[]> {
   const { data } = await supabase
     .from("goals")
     .select(
@@ -219,7 +215,7 @@ async function fetchPriorityEmails(accessToken: string): Promise<BriefEmail[]> {
 
   if (!list.data.messages) return [];
 
-  const threads = await Promise.all(
+  const results = await Promise.allSettled(
     list.data.messages.map(async (msg) => {
       const detail = await gmail.users.messages.get({
         userId: "me",
@@ -230,7 +226,7 @@ async function fetchPriorityEmails(accessToken: string): Promise<BriefEmail[]> {
 
       const headers = detail.data.payload?.headers || [];
       const getHeader = (name: string) =>
-        headers.find((h) => h.name === name)?.value || "";
+        headers.find((h) => h.name?.toLowerCase() === name.toLowerCase())?.value || "";
 
       return {
         id: msg.id!,
@@ -243,7 +239,9 @@ async function fetchPriorityEmails(accessToken: string): Promise<BriefEmail[]> {
     })
   );
 
-  return threads;
+  return results
+    .filter((r): r is PromiseFulfilledResult<BriefEmail> => r.status === "fulfilled")
+    .map((r) => r.value);
 }
 
 async function fetchWeather(): Promise<WeatherData> {
@@ -320,26 +318,26 @@ async function fetchRelevantNews(): Promise<NewsItem[]> {
 
   const allArticles: NewsItem[] = [];
 
-  for (const q of keywords) {
-    try {
-      const res = await fetch(
+  const results = await Promise.allSettled(
+    keywords.map((q) =>
+      fetch(
         `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&sortBy=publishedAt&pageSize=3&apiKey=${apiKey}`,
         { next: { revalidate: 3600 }, signal: AbortSignal.timeout(5000) }
+      ).then((r) => r.json())
+    )
+  );
+
+  for (const result of results) {
+    if (result.status === "fulfilled" && result.value.articles) {
+      allArticles.push(
+        ...result.value.articles.map((a: { title: string; source?: { name?: string }; url: string; publishedAt: string; description?: string }) => ({
+          title: a.title,
+          source: a.source?.name || "Unknown",
+          url: a.url,
+          published: a.publishedAt,
+          snippet: a.description,
+        }))
       );
-      const data = await res.json();
-      if (data.articles) {
-        allArticles.push(
-          ...data.articles.map((a: { title: string; source?: { name?: string }; url: string; publishedAt: string; description?: string }) => ({
-            title: a.title,
-            source: a.source?.name || "Unknown",
-            url: a.url,
-            published: a.publishedAt,
-            snippet: a.description,
-          }))
-        );
-      }
-    } catch {
-      // Skip failed fetches silently
     }
   }
 

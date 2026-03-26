@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import PanelErrorBoundary from "./PanelErrorBoundary";
 import StatsBar from "./StatsBar";
 import CalendarPanel from "./CalendarPanel";
 import TasksPanel from "./TasksPanel";
@@ -26,13 +27,8 @@ export default function Dashboard() {
     if (shouldShowWeeklyReview()) setShowWeeklyReview(true);
   }, []);
 
-  useEffect(() => {
-    fetch("/api/calendar?range=today")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setEventCount(data.length);
-      })
-      .catch(() => {});
+  const handleEventCount = useCallback((count: number) => {
+    setEventCount(count);
   }, []);
 
   const handleTaskCount = useCallback((count: number) => {
@@ -56,8 +52,14 @@ export default function Dashboard() {
       <header className="flex items-center justify-between px-4 lg:px-6 py-4">
         <div className="flex items-center gap-6">
           <h1 className="font-display text-xl font-bold">Command Center</h1>
-          <nav className="flex gap-1 bg-bg-card border border-border rounded-lg p-0.5">
+          <nav
+            aria-label="Main navigation"
+            className="flex gap-1 bg-bg-card border border-border rounded-lg p-0.5"
+            role="tablist"
+          >
             <button
+              role="tab"
+              aria-selected={activeTab === "dashboard"}
               onClick={() => setActiveTab("dashboard")}
               className={`text-sm px-4 py-1.5 rounded-md transition-colors ${
                 activeTab === "dashboard"
@@ -68,6 +70,8 @@ export default function Dashboard() {
               Dashboard
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === "goals"}
               onClick={() => setActiveTab("goals")}
               className={`text-sm px-4 py-1.5 rounded-md transition-colors ${
                 activeTab === "goals"
@@ -98,7 +102,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="px-4 lg:px-6 pb-6 space-y-4">
+      <main id="main-content" className="px-4 lg:px-6 pb-6 space-y-4">
         {activeTab === "dashboard" ? (
           <>
             <StatsBar
@@ -109,21 +113,29 @@ export default function Dashboard() {
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="min-h-[400px]">
-                <CalendarPanel />
-              </div>
-              <div className="min-h-[400px]">
-                <TasksPanel onTaskCountChange={handleTaskCount} />
-              </div>
-              <div className="min-h-[400px]">
-                <InboxPanel onUnreadChange={handleUnread} />
-              </div>
-              <div className="min-h-[400px]">
-                <GoalsSummary
-                  onProgressChange={handleGoalProgress}
-                  onViewAll={() => setActiveTab("goals")}
-                />
-              </div>
+              <section className="min-h-[400px]" aria-label="Calendar">
+                <PanelErrorBoundary fallbackTitle="Calendar unavailable">
+                  <CalendarPanel onEventCountChange={handleEventCount} />
+                </PanelErrorBoundary>
+              </section>
+              <section className="min-h-[400px]" aria-label="Tasks">
+                <PanelErrorBoundary fallbackTitle="Tasks unavailable">
+                  <TasksPanel onTaskCountChange={handleTaskCount} />
+                </PanelErrorBoundary>
+              </section>
+              <section className="min-h-[400px]" aria-label="Priority inbox">
+                <PanelErrorBoundary fallbackTitle="Inbox unavailable">
+                  <InboxPanel onUnreadChange={handleUnread} />
+                </PanelErrorBoundary>
+              </section>
+              <section className="min-h-[400px]" aria-label="Goals summary">
+                <PanelErrorBoundary fallbackTitle="Goals unavailable">
+                  <GoalsSummary
+                    onProgressChange={handleGoalProgress}
+                    onViewAll={() => setActiveTab("goals")}
+                  />
+                </PanelErrorBoundary>
+              </section>
             </div>
           </>
         ) : (

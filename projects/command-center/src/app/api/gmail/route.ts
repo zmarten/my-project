@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { getApiSession } from "@/lib/api-auth";
 import { getGmailClient } from "@/lib/google";
 import type { GmailThread } from "@/types";
 
@@ -9,29 +8,7 @@ function getHeader(headers: { name?: string | null; value?: string | null }[], n
 }
 
 export async function GET() {
-  const cookieStore = cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {}
-        },
-      },
-    }
-  );
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const session = await getApiSession();
   if (!session?.provider_token) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -39,23 +16,28 @@ export async function GET() {
   try {
     const gmail = getGmailClient(session.provider_token);
 
-    // Get important/starred messages
     const list = await gmail.users.messages.list({
       userId: "me",
       q: "is:important OR is:starred",
       maxResults: 10,
     });
 
+    // Fetch all message details in parallel (fixes N+1 pattern)
+    const messageDetails = await Promise.allSettled(
+      (list.data.messages || []).map((msg) =>
+        gmail.users.messages.get({
+          userId: "me",
+          id: msg.id!,
+          format: "metadata",
+          metadataHeaders: ["Subject", "From", "Date"],
+        })
+      )
+    );
+
     const threads: GmailThread[] = [];
-
-    for (const msg of list.data.messages || []) {
-      const full = await gmail.users.messages.get({
-        userId: "me",
-        id: msg.id!,
-        format: "metadata",
-        metadataHeaders: ["Subject", "From", "Date"],
-      });
-
+    for (const result of messageDetails) {
+      if (result.status !== "fulfilled") continue;
+      const full = result.value;
       const headers = full.data.payload?.headers || [];
       const fromRaw = getHeader(headers, "From");
       const senderMatch = fromRaw.match(/^(.+?)\s*<(.+?)>$/);
@@ -63,7 +45,7 @@ export async function GET() {
       const senderEmail = senderMatch ? senderMatch[2] : fromRaw;
 
       threads.push({
-        id: msg.id!,
+        id: full.data.id!,
         subject: getHeader(headers, "Subject") || "(No subject)",
         sender,
         senderEmail,

@@ -158,9 +158,9 @@ export default function TasksPanel({
         <button
           onClick={showSuggestions ? () => setShowSuggestions(false) : loadSuggestions}
           className="text-xs text-text-muted hover:text-accent-green transition-colors font-mono"
-          title="Brain suggestions"
+          aria-label={showSuggestions ? "Hide brain suggestions" : "Show brain suggestions"}
         >
-          {showSuggestions ? "hide suggestions" : "brain ✦"}
+          {showSuggestions ? "hide suggestions" : "brain"}
         </button>
       </div>
 
@@ -479,14 +479,14 @@ function TaskRow({
         type="date"
         value={task.assigned_date ?? ""}
         onChange={(e) => onDateChange(e.target.value || null)}
-        className="opacity-0 group-hover:opacity-100 w-5 h-5 bg-transparent border-none cursor-pointer transition-opacity"
+        className="sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 w-5 h-5 bg-transparent border-none cursor-pointer transition-opacity"
         title="Set date"
         style={{ colorScheme: "dark" }}
       />
       <span className={`tag tag-${task.tag} shrink-0`}>{task.tag}</span>
       <button
         onClick={onDelete}
-        className="opacity-0 group-hover:opacity-100 text-text-muted hover:text-accent-red transition-all text-xs shrink-0"
+        className="sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 text-text-muted hover:text-accent-red transition-[color,opacity] text-xs shrink-0"
         aria-label="Delete task"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

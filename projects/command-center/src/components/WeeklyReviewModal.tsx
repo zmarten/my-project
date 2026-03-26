@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import type { Task, Goal } from "@/types";
 
@@ -10,12 +10,38 @@ interface WeeklyReviewModalProps {
 
 export default function WeeklyReviewModal({ onClose }: WeeklyReviewModalProps) {
   const { supabase, user } = useAuth();
+  const modalRef = useRef<HTMLDivElement>(null);
   const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [reflection, setReflection] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Focus trap: keep Tab cycling within the modal
+  useEffect(() => {
+    const el = modalRef.current;
+    if (!el) return;
+
+    const focusable = el.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    first?.focus();
+
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
+    };
+
+    el.addEventListener("keydown", handleTab);
+    return () => el.removeEventListener("keydown", handleTab);
+  }, [loading]);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -58,9 +84,14 @@ export default function WeeklyReviewModal({ onClose }: WeeklyReviewModalProps) {
       return;
     }
     setSaving(true);
-    // Store reflection as a note — for now just dismiss after brief save simulation
-    // In future: could store in a reflections table or Brain
-    await new Promise((r) => setTimeout(r, 500));
+    const { error } = await supabase.from("weekly_reviews").upsert({
+      user_id: user!.id,
+      week_key: getWeekKey(),
+      reflection: reflection.trim(),
+    });
+    if (error) {
+      console.error("Failed to save review:", error);
+    }
     setSaved(true);
     setSaving(false);
     setTimeout(handleDismiss, 800);
@@ -77,8 +108,15 @@ export default function WeeklyReviewModal({ onClose }: WeeklyReviewModalProps) {
   const weekRange = `${weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${today.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleDismiss} />
+    <div
+      ref={modalRef}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="weekly-review-title"
+      onKeyDown={(e) => { if (e.key === "Escape") handleDismiss(); }}
+    >
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleDismiss} aria-hidden="true" />
       <div className="relative bg-bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
         <div className="p-6 border-b border-border">
@@ -87,10 +125,11 @@ export default function WeeklyReviewModal({ onClose }: WeeklyReviewModalProps) {
               <p className="text-[10px] font-mono text-text-muted uppercase tracking-widest mb-1">
                 Weekly Review
               </p>
-              <h2 className="font-display text-xl font-semibold">{weekRange}</h2>
+              <h2 id="weekly-review-title" className="font-display text-xl font-semibold">{weekRange}</h2>
             </div>
             <button
               onClick={handleDismiss}
+              aria-label="Close weekly review"
               className="text-text-muted hover:text-text-primary transition-colors mt-1"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -198,7 +237,14 @@ export default function WeeklyReviewModal({ onClose }: WeeklyReviewModalProps) {
                   disabled={saving || saved}
                   className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-accent-green/15 text-accent-green hover:bg-accent-green/25 transition-colors disabled:opacity-60"
                 >
-                  {saved ? "Saved ✓" : saving ? "Saving…" : "Complete review"}
+                  {saved ? (
+                    <span className="flex items-center justify-center gap-1.5">
+                      Saved
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                  ) : saving ? "Saving..." : "Complete review"}
                 </button>
               </div>
             </>
@@ -228,6 +274,7 @@ export function getWeekKey(): string {
 }
 
 export function shouldShowWeeklyReview(): boolean {
+  if (typeof window === "undefined") return false;
   const day = new Date().getDay();
   if (day !== 5 && day !== 6 && day !== 0) return false; // Only Fri/Sat/Sun
   const weekKey = getWeekKey();
