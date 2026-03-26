@@ -27,7 +27,7 @@ export default function FocusGrid({ items }: FocusGridProps) {
     <div className="grid grid-cols-2 gap-3">
       {items.map((item, i) => (
         <div
-          key={i}
+          key={item.label || i}
           className="bg-bg-card border border-border rounded-[10px] p-4 relative overflow-hidden hover:border-border-hover transition-colors"
         >
           <div

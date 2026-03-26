@@ -170,5 +170,9 @@ ${JSON.stringify(data.news, null, 2)}`;
     .join("");
 
   const cleaned = text.replace(/```json|```/g, "").trim();
-  return JSON.parse(cleaned) as DailyBrief;
+  try {
+    return JSON.parse(cleaned) as DailyBrief;
+  } catch {
+    throw new Error(`Brief synthesis returned invalid JSON. Raw: ${cleaned.slice(0, 200)}`);
+  }
 }

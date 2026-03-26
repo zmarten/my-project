@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import type { DailyBrief } from "@/lib/brief/synthesize";
@@ -37,6 +37,8 @@ function BriefContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
+  const providerTokenRef = useRef(providerToken);
+  useEffect(() => { providerTokenRef.current = providerToken; }, [providerToken]);
 
   const fetchBrief = async (refresh = false) => {
     if (refresh) setRegenerating(true);
@@ -46,8 +48,9 @@ function BriefContent() {
     try {
       const url = `/api/brief${refresh ? "?refresh=true" : ""}`;
       const headers: Record<string, string> = {};
-      if (providerToken) {
-        headers["x-provider-token"] = providerToken;
+      const token = providerTokenRef.current;
+      if (token) {
+        headers["x-provider-token"] = token;
       }
       const res = await fetch(url, { headers });
 
@@ -68,7 +71,9 @@ function BriefContent() {
 
   useEffect(() => {
     if (!authLoading) fetchBrief();
-  }, [authLoading, providerToken]);
+    // Only trigger on auth completion — providerToken changes are handled via ref
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading]);
 
   if (authLoading || loading) return <BriefSkeleton />;
   if (error) return <BriefError message={error} onRetry={() => fetchBrief()} />;

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getOAuth2Client } from "@/lib/google";
 import { gatherBriefData } from "@/lib/brief/gather";
 import { synthesizeBrief } from "@/lib/brief/synthesize";
 
@@ -15,48 +14,52 @@ export async function GET(req: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  // Get all users (single-user app in practice)
-  const { data: users, error } = await supabase.auth.admin.listUsers();
-  if (error || !users.users.length) {
-    return NextResponse.json({ error: "No users found" }, { status: 404 });
+  const today = new Date().toISOString().split("T")[0];
+
+  // Pull provider tokens from auth.sessions (Supabase stores them here with service role)
+  // Each row has user_id and provider_token for users who have active sessions
+  const { data: sessions, error } = await supabase
+    .from("sessions")
+    .select("user_id, provider_token")
+    .not("provider_token", "is", null);
+
+  if (error) {
+    console.error("Cron: failed to fetch sessions", error.message);
+    return NextResponse.json({ error: "Failed to fetch sessions" }, { status: 500 });
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  if (!sessions?.length) {
+    return NextResponse.json({ date: today, results: [], message: "No active sessions with provider tokens" });
+  }
+
+  // Deduplicate by user_id — take the most recent session per user
+  const userTokenMap = new Map<string, string>();
+  for (const s of sessions) {
+    if (s.provider_token && !userTokenMap.has(s.user_id)) {
+      userTokenMap.set(s.user_id, s.provider_token);
+    }
+  }
+
   const results = [];
 
-  for (const user of users.users) {
+  for (const [userId, providerToken] of Array.from(userTokenMap.entries())) {
     try {
-      // Get the user's stored Google refresh token from their session
-      const { data: sessions } = await supabase
-        .from("user_sessions")
-        .select("provider_refresh_token")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!sessions?.provider_refresh_token) continue;
-
-      // Exchange refresh token for access token
-      const oauth2 = getOAuth2Client();
-      oauth2.setCredentials({ refresh_token: sessions.provider_refresh_token });
-      const { credentials } = await oauth2.refreshAccessToken();
-
-      if (!credentials.access_token) continue;
-
-      const rawData = await gatherBriefData(user.id, credentials.access_token);
+      const rawData = await gatherBriefData(userId, providerToken);
       const brief = await synthesizeBrief(rawData);
 
       await supabase.from("daily_briefs").upsert({
-        user_id: user.id,
+        user_id: userId,
         brief_date: today,
         brief_data: brief,
         raw_context: rawData,
         generated_at: new Date().toISOString(),
       });
 
-      results.push({ user_id: user.id, success: true });
+      results.push({ user_id: userId, success: true });
     } catch (err) {
+      console.error(`Cron: failed for user ${userId}:`, err instanceof Error ? err.message : err);
       results.push({
-        user_id: user.id,
+        user_id: userId,
         success: false,
         error: err instanceof Error ? err.message : "Unknown error",
       });

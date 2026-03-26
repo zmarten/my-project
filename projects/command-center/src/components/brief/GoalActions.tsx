@@ -32,7 +32,7 @@ export default function GoalActions({ items }: GoalActionsProps) {
     <div className="flex flex-col gap-2.5">
       {items.map((item, i) => (
         <div
-          key={i}
+          key={item.goal_name || i}
           className="flex items-start gap-3.5 px-4 py-3.5 bg-bg-card border border-border rounded-[10px] hover:border-border-hover transition-colors"
         >
           <div

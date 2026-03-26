@@ -92,7 +92,9 @@ export default function InboxPanel({
       })
       .catch(() => setThreads([]))
       .finally(() => setLoading(false));
-  }, [onUnreadChange]);
+    // onUnreadChange is intentionally excluded — it's a stable callback from parent
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="panel flex flex-col h-full">

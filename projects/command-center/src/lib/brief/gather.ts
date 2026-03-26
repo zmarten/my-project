@@ -252,7 +252,11 @@ async function fetchWeather(): Promise<WeatherData> {
   const lon = -111.0429;
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FDenver`;
 
-  const res = await fetch(url, { next: { revalidate: 3600 } });
+  const res = await fetch(url, {
+    next: { revalidate: 3600 },
+    signal: AbortSignal.timeout(5000),
+  });
+  if (!res.ok) throw new Error(`Weather API returned ${res.status}`);
   const data = await res.json();
 
   const weatherCodes: Record<number, string> = {
@@ -320,7 +324,7 @@ async function fetchRelevantNews(): Promise<NewsItem[]> {
     try {
       const res = await fetch(
         `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&sortBy=publishedAt&pageSize=3&apiKey=${apiKey}`,
-        { next: { revalidate: 3600 } }
+        { next: { revalidate: 3600 }, signal: AbortSignal.timeout(5000) }
       );
       const data = await res.json();
       if (data.articles) {

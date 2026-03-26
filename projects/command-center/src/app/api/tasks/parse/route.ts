@@ -38,9 +38,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { text, today } = await request.json();
+  let body: { text?: string; today?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+  const { text, today } = body;
   if (!text?.trim()) {
     return NextResponse.json({ error: "No text provided" }, { status: 400 });
+  }
+  if (text.length > 500) {
+    return NextResponse.json({ error: "Text too long" }, { status: 400 });
   }
 
   const todayStr = today || new Date().toISOString().split("T")[0];
@@ -48,10 +57,12 @@ export async function POST(request: NextRequest) {
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const todayDayName = dayNames[todayDate.getDay()];
 
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 256,
-    system: `You parse natural language task input into structured task data. Today is ${todayStr} (${todayDayName}).
+  let message;
+  try {
+    message = await client.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 256,
+      system: `You parse natural language task input into structured task data. Today is ${todayStr} (${todayDayName}).
 
 Return ONLY valid JSON with this shape:
 {
@@ -74,11 +85,20 @@ Date rules:
 - "Monday" → ${getNextWeekday(todayDate, 1)}
 - "next week" → 7 days from today
 - No date mentioned → null`,
-    messages: [{ role: "user", content: text }],
-  });
+      messages: [{ role: "user", content: text }],
+    });
+  } catch (err) {
+    console.error("Claude parse error:", err);
+    return NextResponse.json({ text: text.trim(), tag: "new", assigned_date: null });
+  }
 
   const raw = message.content[0].type === "text" ? message.content[0].text : "";
-  const parsed: ParsedTask = JSON.parse(raw);
+  let parsed: ParsedTask;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return NextResponse.json({ text: text.trim(), tag: "new", assigned_date: null });
+  }
 
   // Validate tag
   if (!TAG_OPTIONS.includes(parsed.tag)) parsed.tag = "new";

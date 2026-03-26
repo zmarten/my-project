@@ -14,7 +14,7 @@ export default function IntelFeed({ items }: IntelFeedProps) {
     <div>
       {items.map((item, i) => (
         <div
-          key={i}
+          key={item.headline || i}
           className={`py-3 ${i < items.length - 1 ? "border-b border-border" : ""}`}
         >
           <div className="flex items-center gap-1.5 font-mono text-[9px] tracking-[0.08em] uppercase text-text-muted mb-1">

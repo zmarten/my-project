@@ -29,7 +29,7 @@ export default function Timeline({ items }: TimelineProps) {
     <div className="flex flex-col gap-0.5">
       {items.map((item, i) => (
         <div
-          key={i}
+          key={`${item.time}-${item.title}-${i}`}
           className="grid gap-3.5 py-2.5 px-2 -mx-2 rounded-lg hover:bg-accent-green/[0.03] transition-colors"
           style={{ gridTemplateColumns: "62px 4px 1fr" }}
         >
