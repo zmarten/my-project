@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1f3a2e" />
+
+    <title>WaypointBridge — Free Garmin to onX GPX Converter for Hunters</title>
+    <meta name="description" content="Free, open-source tool that enriches Garmin GPX waypoints with names, dates, and hunting-style tags before importing to onX Hunt. Runs in your browser. No upload, no account, no tracking." />
+    <link rel="canonical" href="https://zachmartens.com/projects/waypointbridge/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="WaypointBridge — Garmin to onX GPX Converter" />
+    <meta property="og:description" content="Enrich Garmin waypoints with names, dates, and hunting-style tags for onX Hunt. Free, browser-only, MIT-licensed." />
+    <meta property="og:image" content="https://zachmartens.com/projects/waypointbridge/og-image.png" />
+    <meta property="og:url" content="https://zachmartens.com/projects/waypointbridge/" />
+    <meta property="og:site_name" content="WaypointBridge" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="WaypointBridge — Garmin to onX GPX Converter" />
+    <meta name="twitter:description" content="Free browser tool to enrich Garmin GPX waypoints for onX Hunt." />
+    <meta name="twitter:image" content="https://zachmartens.com/projects/waypointbridge/og-image.png" />
+
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="manifest" href="./site.webmanifest" />
+
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="Zach Martens" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "WaypointBridge",
+      "applicationCategory": "UtilitiesApplication",
+      "applicationSubCategory": "GPS Data Converter",
+      "operatingSystem": "Web Browser",
+      "url": "https://zachmartens.com/projects/waypointbridge/",
+      "description": "Free, open-source browser tool that enriches Garmin GPX waypoints with names, dates, and hunting-style tags before import to onX Hunt.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "license": "https://opensource.org/licenses/MIT",
+      "author": {
+        "@type": "Person",
+        "name": "Zach Martens"
+      },
+      "browserRequirements": "Requires JavaScript. Modern browser (Chrome, Firefox, Safari, Edge)."
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is WaypointBridge free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. MIT licensed, browser-only, no account required, no upload, no tracking."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does my GPX file get uploaded to a server?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. All processing happens in your browser. Your waypoints, including coordinates, never leave your device."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which Garmin devices are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Any Garmin device that exports standard GPX through Garmin Connect, including Fenix 6 and 7, Instinct 2, Tactix, Epix, and inReach Mini 2."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do my Garmin waypoints show up as WPT001 in onX?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Garmin watches default to numbered names. WaypointBridge automatically renames waypoints with hunt date, time, elevation, and aspect — and tags them by hunting style — before import to onX Hunt."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does onX Hunt strip my Garmin waypoint timestamps?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "onX Hunt's GPX importer only preserves a waypoint's name, coordinates, and description field. The time element is dropped. WaypointBridge encodes the hunt date directly into the waypoint name to work around this."
+          }
+        }
+      ]
+    }
+    </script>
+    <script type="module" crossorigin src="./assets/index-CBf3sbog.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Bzv3uOID.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
