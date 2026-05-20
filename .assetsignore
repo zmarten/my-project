@@ -1,0 +1,20 @@
+projects/MTNTOUGH PP30/private/
+projects/MTNTOUGH PP30/W1 to W5/
+projects/MTNTOUGH PP30/workout-text.js
+projects/MTNTOUGH PP30/PP30-weeks-1-5-context.md
+projects/MTNTOUGH PP30/PP30-weeks-1-5-day-by-day-summary.md
+# WaypointBridge dev tree — built output lives at projects/waypointbridge/.
+# Hide the source tree (TS, tests, package.json) from public serving.
+projects/onx converter/
+*.mp4
+.git/
+.wrangler/
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+**/Releases/
+*.exe
+*.zip
+*.tar.gz
+*.log
