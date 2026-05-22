@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MTNTOUGH PP30 Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <nav class="topbar" aria-label="Primary">
+      <a class="brand" href="../../index.html">MTN</a>
+      <div class="topbar-actions">
+        <a href="../../index.html#projects" class="ghost-link">Projects</a>
+        <button class="view-toggle" id="mobileViewBtn" type="button" aria-pressed="false">
+          <i data-lucide="smartphone"></i>
+          <span>Mobile</span>
+        </button>
+        <button class="icon-button" id="exportBtn" type="button" title="Export training log" aria-label="Export training log">
+          <i data-lucide="download"></i>
+        </button>
+        <button class="icon-button danger" id="resetBtn" type="button" title="Reset tracker" aria-label="Reset tracker">
+          <i data-lucide="rotate-ccw"></i>
+        </button>
+      </div>
+    </nav>
+
+    <section class="dashboard-band">
+      <div>
+        <p class="eyebrow">MTNTOUGH Preseason Prep 3.0</p>
+        <h1>Workout Tracker</h1>
+        <p class="header-copy">Track the 25 workouts from Weeks 1-5, log key results, and keep your Phase 1 progress in one place.</p>
+      </div>
+      <div class="progress-ring" aria-label="Program completion">
+        <svg viewBox="0 0 120 120" role="img">
+          <circle class="ring-bg" cx="60" cy="60" r="48"></circle>
+          <circle class="ring-fill" id="progressRing" cx="60" cy="60" r="48"></circle>
+        </svg>
+        <div class="ring-label">
+          <strong id="progressPercent">0%</strong>
+          <span>complete</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-grid" aria-label="Program stats">
+      <div class="stat">
+        <span class="stat-label">Completed</span>
+        <strong id="completedCount">0 / 25</strong>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Current Week</span>
+        <strong id="currentWeek">Week 1</strong>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Strength</span>
+        <strong id="strengthCount">0 / 12</strong>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Conditioning</span>
+        <strong id="conditioningCount">0 / 8</strong>
+      </div>
+    </section>
+  </header>
+
+  <main class="app-shell">
+    <aside class="sidebar" aria-label="Workout filters and list">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Plan</p>
+          <h2>Weeks 1-5</h2>
+        </div>
+        <span id="visibleCount" class="count-pill">25</span>
+      </div>
+
+      <div class="controls">
+        <label class="search-field">
+          <i data-lucide="search"></i>
+          <input id="searchInput" type="search" placeholder="Search workouts">
+        </label>
+
+        <div class="segmented" aria-label="Week filter">
+          <button class="chip active" type="button" data-week="all">All</button>
+          <button class="chip" type="button" data-week="1">W1</button>
+          <button class="chip" type="button" data-week="2">W2</button>
+          <button class="chip" type="button" data-week="3">W3</button>
+          <button class="chip" type="button" data-week="4">W4</button>
+          <button class="chip" type="button" data-week="5">W5</button>
+        </div>
+
+        <div class="segmented" aria-label="Type filter">
+          <button class="chip active" type="button" data-type="all">All</button>
+          <button class="chip" type="button" data-type="strength">Strength</button>
+          <button class="chip" type="button" data-type="conditioning">Conditioning</button>
+          <button class="chip" type="button" data-type="test">Tests</button>
+        </div>
+      </div>
+
+      <div class="workout-list" id="workoutList"></div>
+    </aside>
+
+    <section class="detail-panel" id="detailPanel" aria-live="polite"></section>
+  </main>
+
+  <template id="workoutButtonTemplate">
+    <button class="workout-row" type="button">
+      <span class="status-dot"></span>
+      <span class="row-main">
+        <span class="row-title"></span>
+        <span class="row-meta"></span>
+      </span>
+      <i data-lucide="chevron-right"></i>
+    </button>
+  </template>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

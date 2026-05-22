@@ -1,1 +1,36 @@
 *.mp4
+
+# PP30 private/source content (workout PDFs etc. — never commit)
+projects/MTNTOUGH PP30/private/
+projects/MTNTOUGH PP30/W1 to W5/
+projects/MTNTOUGH PP30/workout-text.js
+projects/MTNTOUGH PP30/PP30-weeks-1-5-context.md
+projects/MTNTOUGH PP30/PP30-weeks-1-5-day-by-day-summary.md
+
+# Nested projects with their own GitHub repos
+projects/hitl/
+projects/yardstick/
+projects/onx converter/
+projects/CoveyTracker/
+projects/GarminChatDesktop/
+projects/LeaveTracker/
+projects/leave-tracker-web/
+
+# Local backups / snapshots
+projects/Brain.old-2026-05-13/
+
+# Not yet ready to push
+projects/garminexport/
+
+# command-center scratch (project lives at projects/command-center, but these are local-only)
+projects/command-center/.claude/
+projects/command-center/files/
+projects/command-center/files.zip
+
+# Cloudflare / Wrangler dev state
+.wrangler/
+.wrangler-dev*.log
+
+# Scratch / transcripts / archives
+mux-transcript*.txt
+hitl-service.tar.gz

@@ -1,7 +1,25 @@
 {
-  "name": "my-project",
-  "compatibility_date": "2026-02-08",
-  "assets": {
-    "directory": "./"
-  }
+	"name": "my-project",
+	"compatibility_date": "2026-02-08",
+	"main": "worker.js",
+	"assets": {
+		"directory": "./",
+		"binding": "ASSETS",
+		"run_worker_first": true
+	},
+	"vars": {
+		"REQUIRE_ACCESS": "true",
+		"ALLOWED_EMAILS": "zachdmartens@gmail.com",
+		"ACCESS_TEAM_DOMAIN": "",
+		"ACCESS_AUD": ""
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "pp30-tracker",
+			"database_id": "034a4657-ba7b-4850-931b-db23ce6f29da",
+			"migrations_dir": "projects/MTNTOUGH PP30/migrations",
+			"remote": true
+		}
+	]
 }

@@ -1,0 +1,1225 @@
+:root {
+  --forest-deep: #f4f1eb;
+  --moss-main: #b8a06f;
+  --sage-medium: #8a8f78;
+  --fern-bright: #d8c08a;
+  --stone-dark: #f4f1eb;
+  --stone-medium: #b9b5ac;
+  --mist-light: #242424;
+  --cloud-white: #111111;
+  --pure-white: #ffffff;
+  --earth-warm: #c59a4a;
+  --sky-pale: #2f332b;
+  --bark-brown: #c9c0ad;
+  --error: #d35f45;
+  --coal: #0b0b0b;
+  --charcoal: #171717;
+  --iron: #2b2b2b;
+  --line: rgba(255, 255, 255, 0.13);
+  --shadow-soft: 0 22px 55px rgba(0, 0, 0, 0.42);
+  --shadow-light: 0 10px 26px rgba(0, 0, 0, 0.26);
+  --font-display: "Poppins", sans-serif;
+  --font-body: "Quicksand", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(184, 160, 111, 0.16), transparent 28rem),
+    linear-gradient(180deg, #0b0b0b 0%, #141414 45%, #0b0b0b 100%);
+  color: var(--stone-dark);
+  font-family: var(--font-body);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(120deg, transparent 0 58%, rgba(184, 160, 111, 0.08) 58% 59%, transparent 59%),
+    linear-gradient(24deg, transparent 0 46%, rgba(255, 255, 255, 0.035) 46% 47%, transparent 47%);
+  opacity: 0.9;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-header {
+  padding: 20px clamp(16px, 4vw, 48px) 24px;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.82)),
+    linear-gradient(135deg, #2a2a2a, #101010 52%, #0b0b0b);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar,
+.dashboard-band,
+.stats-grid,
+.app-shell {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.brand {
+  display: inline-grid;
+  width: auto;
+  min-width: 116px;
+  height: 44px;
+  padding: 0 12px;
+  place-items: center;
+  color: var(--coal);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  border: 1px solid var(--moss-main);
+  background: var(--moss-main);
+  border-radius: 2px;
+  box-shadow: var(--shadow-light);
+}
+
+.brand::after {
+  content: "TOUGH";
+  margin-left: 2px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ghost-link {
+  color: var(--pure-white);
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+}
+
+.icon-button {
+  display: inline-grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--pure-white);
+  background: rgba(255, 255, 255, 0.07);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.icon-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
+  color: var(--moss-main);
+}
+
+.icon-button.danger {
+  color: var(--error);
+}
+
+.view-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--pure-white);
+  background: rgba(255, 255, 255, 0.07);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.view-toggle[aria-pressed="true"] {
+  color: var(--coal);
+  background: var(--moss-main);
+  border-color: var(--moss-main);
+}
+
+.dashboard-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 28px;
+  align-items: center;
+}
+
+.dashboard-band::before {
+  content: "PRESEASON PREP 3.0";
+  grid-column: 1 / -1;
+  width: max-content;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid rgba(184, 160, 111, 0.45);
+  color: var(--moss-main);
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--moss-main);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: var(--pure-white);
+  font-family: var(--font-display);
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 4.25rem);
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 1.35rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+}
+
+.header-copy {
+  max-width: 740px;
+  margin: 14px 0 0;
+  color: #d7d2c7;
+  font-size: 1.04rem;
+  line-height: 1.6;
+}
+
+.progress-ring {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.35));
+}
+
+.progress-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-bg,
+.ring-fill {
+  fill: none;
+  stroke-width: 10;
+}
+
+.ring-bg {
+  stroke: rgba(255, 255, 255, 0.18);
+}
+
+.ring-fill {
+  stroke: var(--moss-main);
+  stroke-linecap: round;
+  stroke-dasharray: 301.59;
+  stroke-dashoffset: 301.59;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.ring-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.ring-label strong {
+  color: var(--pure-white);
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+}
+
+.ring-label span {
+  color: var(--stone-medium);
+  font-size: 0.8rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.stat,
+.sidebar,
+.detail-panel {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(35, 35, 35, 0.96), rgba(18, 18, 18, 0.98));
+  box-shadow: var(--shadow-light);
+}
+
+.stat {
+  padding: 16px;
+  border-radius: 2px;
+  border-top: 3px solid var(--moss-main);
+}
+
+.stat-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--stone-medium);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.stat strong {
+  color: var(--pure-white);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  gap: 22px;
+  padding: 24px clamp(16px, 4vw, 48px) 48px;
+}
+
+.sidebar,
+.detail-panel {
+  border-radius: 2px;
+}
+
+.sidebar {
+  align-self: start;
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.count-pill {
+  align-self: start;
+  min-width: 36px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--coal);
+  background: var(--moss-main);
+  text-align: center;
+  font-weight: 800;
+}
+
+.controls {
+  display: grid;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--coal);
+  color: var(--sage-medium);
+}
+
+.search-field input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--pure-white);
+}
+
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--pure-white);
+  background: transparent;
+  font-size: 0.86rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.chip.active {
+  color: var(--coal);
+  background: var(--moss-main);
+  border-color: var(--moss-main);
+}
+
+.workout-list {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  overflow: auto;
+}
+
+.workout-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 13px 12px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: var(--stone-dark);
+  background: transparent;
+  text-align: left;
+}
+
+.workout-row:hover,
+.workout-row.active {
+  border-color: rgba(107, 143, 113, 0.28);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.status-dot {
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--moss-main);
+  border-radius: 50%;
+}
+
+.workout-row.complete .status-dot {
+  background: var(--moss-main);
+}
+
+.row-main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.row-title {
+  overflow: hidden;
+  color: var(--pure-white);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-meta {
+  overflow: hidden;
+  color: var(--stone-medium);
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-panel {
+  min-height: 620px;
+  padding: clamp(18px, 3vw, 30px);
+}
+
+.detail-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tag {
+  padding: 6px 10px;
+  border-radius: 2px;
+  color: var(--coal);
+  background: var(--moss-main);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.complete-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--moss-main);
+  border-radius: 2px;
+  color: var(--coal);
+  background: var(--moss-main);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.complete-toggle.is-complete {
+  color: var(--pure-white);
+  background: #2f3a24;
+  border-color: var(--moss-main);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  gap: 22px;
+  margin-top: 24px;
+}
+
+.section-block {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(11, 11, 11, 0.62);
+}
+
+.section-block + .section-block {
+  margin-top: 14px;
+}
+
+.section-block h3 {
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.summary-list,
+.track-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.summary-list li,
+.track-list li {
+  line-height: 1.5;
+}
+
+.workout-prescription {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--stone-dark);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.workout-day {
+  color: var(--sage-medium);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.workout-title-line {
+  margin: 2px 0 16px;
+  color: var(--pure-white);
+  font-family: var(--font-display);
+  font-size: 1.24rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.workout-sections {
+  display: grid;
+  gap: 12px;
+}
+
+.workout-step {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: #101010;
+}
+
+.workout-step h4 {
+  margin: 0;
+  padding: 10px 13px;
+  border-left: 5px solid var(--moss-main);
+  background: linear-gradient(90deg, rgba(184, 160, 111, 0.24), rgba(255, 255, 255, 0.04));
+  color: var(--pure-white);
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.workout-step-lines {
+  display: grid;
+  gap: 1px;
+  padding: 10px 13px 12px;
+}
+
+.workout-exercise,
+.workout-instruction,
+.workout-note,
+.workout-timing,
+.workout-track-callout {
+  padding: 5px 0 5px 14px;
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.workout-instruction {
+  color: #d9d2c3;
+  font-weight: 700;
+}
+
+.workout-note {
+  margin: 3px 0 3px 8px;
+  padding: 7px 10px;
+  border-left: 3px solid var(--earth-warm);
+  border-radius: 2px;
+  background: rgba(197, 154, 74, 0.16);
+  color: #efe1c1;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.workout-timing {
+  color: var(--moss-main);
+  font-weight: 900;
+}
+
+.workout-track-callout {
+  margin: 4px 0 4px 8px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--sage-medium);
+  border-radius: 2px;
+  background: rgba(138, 143, 120, 0.18);
+  color: var(--pure-white);
+  font-weight: 800;
+}
+
+.track-log-panel {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid rgba(184, 160, 111, 0.34);
+  border-radius: 2px;
+  background: rgba(184, 160, 111, 0.1);
+}
+
+.track-log-panel h4 {
+  margin: 0;
+  color: var(--pure-white);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.track-log-panel p {
+  margin: 0;
+  color: var(--stone-medium);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric-field {
+  min-width: 0;
+}
+
+.log-form {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+.field span {
+  color: var(--pure-white);
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: #0b0b0b;
+  color: var(--pure-white);
+  outline: 0;
+}
+
+.field input:focus,
+.field textarea:focus,
+.search-field:focus-within {
+  border-color: var(--moss-main);
+  box-shadow: 0 0 0 2px rgba(184, 160, 111, 0.18);
+}
+
+.field input {
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.field textarea {
+  min-height: 138px;
+  resize: vertical;
+  padding: 12px;
+  line-height: 1.5;
+}
+
+.empty-state {
+  display: grid;
+  min-height: 360px;
+  place-content: center;
+  color: var(--stone-medium);
+  text-align: center;
+}
+
+.empty-state i {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 12px;
+  color: var(--sage-medium);
+}
+
+.toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 10;
+  padding: 12px 14px;
+  border-radius: 2px;
+  color: var(--coal);
+  background: var(--moss-main);
+  box-shadow: var(--shadow-soft);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 980px) {
+  .dashboard-band,
+  .detail-header,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .progress-ring {
+    justify-self: start;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    padding-inline: 14px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell {
+    padding: 18px 14px 36px;
+  }
+
+  .topbar-actions {
+    gap: 8px;
+  }
+
+  .ghost-link {
+    display: none;
+  }
+
+  .complete-toggle {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  body,
+  body.mobile-preview {
+    background:
+      radial-gradient(circle at 12% 0%, rgba(184, 160, 111, 0.14), transparent 20rem),
+      #0b0b0b;
+  }
+
+  .app-header,
+  body.mobile-preview .app-header {
+    padding: 12px 12px 14px;
+  }
+
+  .topbar,
+  body.mobile-preview .topbar {
+    margin-bottom: 16px;
+  }
+
+  .dashboard-band,
+  body.mobile-preview .dashboard-band {
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+  }
+
+  h1,
+  body.mobile-preview h1 {
+    font-size: 1.8rem;
+  }
+
+  .header-copy,
+  body.mobile-preview .header-copy {
+    display: none;
+  }
+
+  .progress-ring,
+  body.mobile-preview .progress-ring {
+    width: 82px;
+    height: 82px;
+  }
+
+  .ring-label strong,
+  body.mobile-preview .ring-label strong {
+    font-size: 1.1rem;
+  }
+
+  .ring-label span,
+  body.mobile-preview .ring-label span {
+    font-size: 0.68rem;
+  }
+
+  .stats-grid,
+  body.mobile-preview .stats-grid {
+    grid-template-columns: repeat(4, minmax(96px, 1fr));
+    gap: 8px;
+    margin-top: 14px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .stat,
+  body.mobile-preview .stat {
+    padding: 10px;
+  }
+
+  .stat strong,
+  body.mobile-preview .stat strong {
+    font-size: 1rem;
+  }
+
+  .app-shell,
+  body.mobile-preview .app-shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px 12px 32px;
+  }
+
+  .sidebar,
+  body.mobile-preview .sidebar {
+    position: static;
+    max-height: none;
+  }
+
+  .panel-heading,
+  body.mobile-preview .panel-heading {
+    padding: 14px;
+  }
+
+  .controls,
+  body.mobile-preview .controls {
+    padding: 12px 14px;
+  }
+
+  .segmented,
+  body.mobile-preview .segmented {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .chip,
+  body.mobile-preview .chip {
+    flex: 0 0 auto;
+  }
+
+  .workout-list,
+  body.mobile-preview .workout-list {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    overflow-x: auto;
+  }
+
+  .workout-row,
+  body.mobile-preview .workout-row {
+    grid-template-columns: auto minmax(0, 1fr);
+    flex: 0 0 236px;
+    min-height: 74px;
+    border-color: rgba(107, 143, 113, 0.2);
+    background: #101010;
+  }
+
+  .workout-row > i,
+  body.mobile-preview .workout-row > i {
+    display: none;
+  }
+
+  .row-title,
+  body.mobile-preview .row-title {
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  .detail-panel,
+  body.mobile-preview .detail-panel {
+    min-height: auto;
+    padding: 14px;
+  }
+
+  .detail-header,
+  body.mobile-preview .detail-header {
+    gap: 12px;
+    padding-bottom: 14px;
+  }
+
+  .complete-toggle,
+  body.mobile-preview .complete-toggle {
+    position: sticky;
+    top: 8px;
+    z-index: 3;
+    justify-content: center;
+    width: 100%;
+    box-shadow: var(--shadow-light);
+  }
+
+  .detail-grid,
+  body.mobile-preview .detail-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .section-block,
+  body.mobile-preview .section-block {
+    padding: 12px;
+  }
+
+  .workout-title-line,
+  body.mobile-preview .workout-title-line {
+    font-size: 1.08rem;
+  }
+
+  .workout-step h4,
+  body.mobile-preview .workout-step h4 {
+    padding: 9px 11px;
+    font-size: 0.92rem;
+  }
+
+  .workout-step-lines,
+  body.mobile-preview .workout-step-lines {
+    padding: 8px 11px 10px;
+  }
+
+  .workout-exercise,
+  .workout-instruction,
+  .workout-note,
+  .workout-timing,
+  .workout-track-callout,
+  body.mobile-preview .workout-exercise,
+  body.mobile-preview .workout-instruction,
+  body.mobile-preview .workout-note,
+  body.mobile-preview .workout-timing,
+  body.mobile-preview .workout-track-callout {
+    padding-left: 10px;
+    font-size: 0.92rem;
+  }
+
+  .metric-grid,
+  body.mobile-preview .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field input,
+  body.mobile-preview .field input {
+    min-height: 46px;
+  }
+
+  .field textarea,
+  body.mobile-preview .field textarea {
+    min-height: 120px;
+  }
+}
+
+body.mobile-preview {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(184, 160, 111, 0.18), transparent 28rem),
+    #050505;
+}
+
+body.mobile-preview .app-header {
+  padding: 12px 12px 14px;
+}
+
+body.mobile-preview .app-header,
+body.mobile-preview .app-shell {
+  max-width: 430px;
+  margin-inline: auto;
+}
+
+body.mobile-preview .app-header {
+  margin-top: 14px;
+  border: 1px solid rgba(107, 143, 113, 0.24);
+  border-bottom: 0;
+  border-radius: 22px 22px 0 0;
+}
+
+body.mobile-preview .app-shell {
+  border: 1px solid rgba(107, 143, 113, 0.24);
+  border-top: 0;
+  border-radius: 0 0 22px 22px;
+  background: #0b0b0b;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 12px 12px 32px;
+}
+
+body.mobile-preview .topbar {
+  margin-bottom: 16px;
+}
+
+body.mobile-preview .dashboard-band {
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+}
+
+body.mobile-preview h1 {
+  font-size: 1.8rem;
+}
+
+body.mobile-preview .header-copy {
+  display: none;
+}
+
+body.mobile-preview .progress-ring {
+  width: 82px;
+  height: 82px;
+}
+
+body.mobile-preview .ring-label strong {
+  font-size: 1.1rem;
+}
+
+body.mobile-preview .ring-label span {
+  font-size: 0.68rem;
+}
+
+body.mobile-preview .stats-grid {
+  grid-template-columns: repeat(4, minmax(96px, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+body.mobile-preview .stat {
+  padding: 10px;
+}
+
+body.mobile-preview .stat strong {
+  font-size: 1rem;
+}
+
+body.mobile-preview .sidebar {
+  position: static;
+  max-height: none;
+}
+
+body.mobile-preview .panel-heading {
+  padding: 14px;
+}
+
+body.mobile-preview .controls {
+  padding: 12px 14px;
+}
+
+body.mobile-preview .segmented {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+body.mobile-preview .chip {
+  flex: 0 0 auto;
+}
+
+body.mobile-preview .workout-list {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  overflow-x: auto;
+}
+
+body.mobile-preview .workout-row {
+  grid-template-columns: auto minmax(0, 1fr);
+  flex: 0 0 236px;
+  min-height: 74px;
+  border-color: var(--line);
+  background: #101010;
+}
+
+body.mobile-preview .workout-row > i {
+  display: none;
+}
+
+body.mobile-preview .row-title {
+  white-space: normal;
+  line-height: 1.25;
+}
+
+body.mobile-preview .detail-panel {
+  min-height: auto;
+  padding: 14px;
+}
+
+body.mobile-preview .detail-header {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding-bottom: 14px;
+}
+
+body.mobile-preview .complete-toggle {
+  position: sticky;
+  top: 8px;
+  z-index: 3;
+  justify-content: center;
+  width: 100%;
+  box-shadow: var(--shadow-light);
+}
+
+body.mobile-preview .detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+body.mobile-preview .section-block {
+  padding: 12px;
+}
+
+body.mobile-preview .workout-title-line {
+  font-size: 1.08rem;
+}
+
+body.mobile-preview .workout-step h4 {
+  padding: 9px 11px;
+  font-size: 0.92rem;
+}
+
+body.mobile-preview .workout-step-lines {
+  padding: 8px 11px 10px;
+}
+
+body.mobile-preview .workout-exercise,
+body.mobile-preview .workout-instruction,
+body.mobile-preview .workout-note,
+body.mobile-preview .workout-timing,
+body.mobile-preview .workout-track-callout {
+  padding-left: 10px;
+  font-size: 0.92rem;
+}
+
+body.mobile-preview .metric-grid {
+  grid-template-columns: 1fr;
+}
+
+body.mobile-preview .field input {
+  min-height: 46px;
+}
+
+body.mobile-preview .field textarea {
+  min-height: 120px;
+}
