@@ -1,5 +1,27 @@
 node_modules/
 dist/
+.DS_Store
+
+# Credentials & runtime state
 .env
 .env.local
+.env.*.local
+credentials.json
+token.json
+
+# Logs
 npm-debug.log*
+
+# Maintainer-local overlays (kept local, not part of upstream contract)
+.planning/
+.local/
+.agent/
+.claude.json
+
+# Python caches (some import recipes are Python)
+__pycache__/
+*.pyc
+
+# Supabase local stack
+supabase/
+deno.lock

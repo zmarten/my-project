@@ -1,226 +1,110 @@
-# Open Brain MCP Server
+# Open Brain
 
-An agent-readable personal knowledge system. Store your thoughts in a Postgres database with vector embeddings, and query them from **any** MCP-compatible AI client — Claude, ChatGPT, Cursor, Claude Code, VS Code, and whatever ships next.
+An agent-readable personal knowledge store. Thoughts go into Supabase (Postgres + pgvector); any MCP-compatible client (Claude Desktop, Claude Code, Cursor, ChatGPT, …) reads and writes them through a Supabase Edge Function over HTTP.
 
-**Architecture:** Supabase (Postgres + pgvector) → OpenAI embeddings → MCP server → Any AI client
+> Derived from [Open Brain (OB1)](https://github.com/NateBJones-Projects/OB1) by [Nate B. Jones](https://natesnewsletter.substack.com/). Licensed FSL-1.1-MIT — see `LICENSE.md`.
 
-**Cost:** ~$0.10–0.30/month on free tiers for ~20 thoughts/day.
-
----
-
-## What It Does
-
-- **Capture** a thought → generates a vector embedding + extracts metadata (type, people, topics, action items, summary) in parallel
-- **Semantic search** → finds thoughts by meaning, not keywords ("career changes" finds notes about "considering consulting")
-- **List recent** → browse with filters by type, topic, or person
-- **Stats** → see your thinking patterns (top topics, people, activity)
-- **Archive** → soft-delete thoughts you no longer need
-
----
-
-## Setup (30–45 minutes)
-
-### 1. Create a Supabase Project (Free Tier)
-
-1. Go to [supabase.com](https://supabase.com) and create an account
-2. Create a new project — pick any name (e.g., "open-brain"), choose a region close to you
-3. Wait for the project to finish provisioning (~2 min)
-4. Go to **SQL Editor** in the left sidebar
-5. Paste the entire contents of `setup.sql` and click **Run**
-6. Go to **Settings → API** and copy:
-   - Your **Project URL** (looks like `https://abcxyz.supabase.co`)
-   - Your **service_role key** (the secret one, NOT the anon key)
-
-### 2. Get an OpenAI API Key
-
-1. Go to [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-2. Create a new key (you'll need a few dollars of credit for embeddings)
-3. Copy the key
-
-### 3. Install & Configure
-
-```bash
-# Clone or copy this project
-cd open-brain-mcp-server
-
-# Install dependencies
-npm install
-```
-
-Create your `.env` file:
-
-```bash
-cp .env.example .env
-```
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Edit `.env` with your actual values:
-```
-SUPABASE_URL=https://your-project-id.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-OPENAI_API_KEY=sk-your-openai-key
-```
-
-### 4. Build
-
-```bash
-npm run build
-```
-
-### 5. Start the Server
-
-The server auto-loads environment variables from `.env` during local runs.
-
-```bash
-npm start
-```
-
-### 6. Connect to Your AI Clients
-
-#### Claude Desktop / Claude Code
-
-Add to your Claude MCP config file:
-
-**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "open-brain": {
-      "command": "node",
-      "args": ["/full/path/to/open-brain-mcp-server/dist/index.js"],
-      "env": {
-        "SUPABASE_URL": "https://your-project-id.supabase.co",
-        "SUPABASE_SERVICE_ROLE_KEY": "your-service-role-key",
-        "OPENAI_API_KEY": "sk-your-openai-key"
-      }
-    }
-  }
-}
-```
-
-#### Cursor
-
-Add to `.cursor/mcp.json` in your home directory or project:
-
-```json
-{
-  "mcpServers": {
-    "open-brain": {
-      "command": "node",
-      "args": ["/full/path/to/open-brain-mcp-server/dist/index.js"],
-      "env": {
-        "SUPABASE_URL": "https://your-project-id.supabase.co",
-        "SUPABASE_SERVICE_ROLE_KEY": "your-service-role-key",
-        "OPENAI_API_KEY": "sk-your-openai-key"
-      }
-    }
-  }
-}
-```
-
-#### Claude Code (CLI)
-
-```bash
-claude mcp add open-brain -- node /full/path/to/open-brain-mcp-server/dist/index.js
-```
-
-You'll need to set the env vars in your shell profile or pass them inline.
-
----
-
-## Tools Reference
-
-### `brain_capture`
-Store a thought with auto-generated embedding and metadata.
-
-```
-text: "Had a call with Sarah — she's thinking about leaving her job for consulting"
-source: "claude" (optional, defaults to "mcp")
-```
-
-### `brain_search`
-Find thoughts by meaning using semantic similarity.
-
-```
-query: "career transitions"
-limit: 10 (optional)
-threshold: 0.4 (optional, lower = more results)
-```
-
-### `brain_list_recent`
-Browse recent thoughts with optional filters.
-
-```
-limit: 20 (optional)
-offset: 0 (optional)
-thought_type: "decision" (optional)
-topic: "AI" (optional)
-person: "Sarah" (optional)
-```
-
-### `brain_stats`
-Get an overview of your brain — totals, top topics, top people, breakdown by type.
-
-### `brain_archive`
-Soft-delete a thought by UUID.
-
-```
-id: "uuid-here"
-```
-
----
-
-## Migration: Import Your Existing AI Memories
-
-After setup, run this prompt in Claude (or ChatGPT) to migrate your existing memories:
-
-> "I've set up an Open Brain system. I want to migrate everything you know about me into it. Go through your memories about me — my role, projects, key people, decisions, preferences, constraints — and for each one, use the brain_capture tool to save it. Tag the source as 'migration'. Be thorough."
-
-Then do the same in ChatGPT if you have memories there.
-
----
-
-## Quick Capture Templates
-
-Use these patterns for clean metadata extraction:
-
-**Decision:** "Decision: [what you decided] because [reasoning]. Alternatives considered: [options]"
-
-**Person note:** "Person note about [Name]: [observation]. Context: [situation]"
-
-**Insight:** "Insight: [realization]. This matters because [why]"
-
-**Meeting debrief:** "Meeting with [people] about [topic]. Key points: [points]. Action items: [items]"
-
-**Project update:** "Project [name] update: [status]. Next steps: [steps]. Blockers: [blockers]"
-
----
-
-## Weekly Review Prompt
-
-Run this on Fridays:
-
-> "Pull my brain_stats and brain_list_recent for this week. Cluster my thoughts by topic, surface any unresolved action items, identify patterns across the week, and flag connections I might have missed. What gaps am I not tracking?"
+**Divergence from upstream:** this fork talks to OpenAI directly (`https://api.openai.com/v1`) instead of OpenRouter, so no separate gateway account is needed. Everything else (tool shapes, schema, auth model) matches OB1.
 
 ---
 
 ## Architecture
 
 ```
-You (any AI client)
-    ↓ MCP (stdio)
-Open Brain MCP Server
-    ↓ parallel
-    ├─ OpenAI text-embedding-3-small → vector embedding
-    └─ OpenAI gpt-4o-mini → metadata extraction
-    ↓
-Supabase Postgres + pgvector
-    └─ thoughts table (raw_text, embedding, metadata, timestamps)
+Any MCP client
+    │  HTTPS  (x-brain-key header)
+    ▼
+Supabase Edge Function: open-brain
+    │  fan-out
+    ├─ OpenAI text-embedding-3-small  → 1536-dim vector
+    └─ OpenAI gpt-4o-mini             → metadata JSON
+    ▼
+Supabase Postgres
+    public.thoughts (content, embedding vector(1536), metadata jsonb, …)
+    + match_thoughts(query_embedding, threshold, count, filter jsonb)
+    + upsert_thought(content, payload) — SHA256-fingerprint dedup
 ```
 
-One brain. Every AI. Your data. ~$0.10/month.
+Function URL: `https://zjacstloskeynbblhgno.supabase.co/functions/v1/open-brain`
+
+---
+
+## MCP tools
+
+- `capture_thought(content)` — embed + extract people/topics/actions + upsert
+- `search_thoughts(query, limit?, threshold?)` — semantic search
+- `list_thoughts(limit?, type?, topic?, person?, days?)` — filtered recents
+- `thought_stats()` — totals, top topics, top people, type breakdown
+- `search(query)` / `fetch(id)` — ChatGPT-compatible read-only pair
+
+---
+
+## Setup
+
+### 1. Apply the schema
+
+Already done in project `zjacstloskeynbblhgno`. To reproduce in a new Supabase project, run the SQL blocks from [docs/01-getting-started.md](https://github.com/NateBJones-Projects/OB1/blob/main/docs/01-getting-started.md#step-2-set-up-the-database):
+
+- pgvector extension
+- `thoughts` table + HNSW/GIN/created_at indexes
+- `update_updated_at` trigger
+- `match_thoughts` (4-arg) function
+- `content_fingerprint` column + `upsert_thought` function
+- service_role grants
+
+Note: this repo's deployed setup keeps RLS **disabled** on `public.thoughts` because the Edge Function's `x-brain-key` gate is the real auth boundary, and the Supabase JS client here uses a JWT whose `role` claim is `anon`, not `service_role` (the OB1 RLS policy `auth.role()='service_role'` would block every request). If you switch to a real service_role JWT, re-enable RLS and the policy.
+
+### 2. Deploy the Edge Function
+
+```
+# from this repo, using the Supabase MCP:
+deploy_edge_function project_id=zjacstloskeynbblhgno \
+                     name=open-brain \
+                     entrypoint_path=index.ts \
+                     verify_jwt=false \
+                     files=[server/index.ts, server/deno.json]
+```
+
+### 3. Set secrets
+
+At https://supabase.com/dashboard/project/zjacstloskeynbblhgno/functions/open-brain/secrets:
+
+| Secret | Value |
+| --- | --- |
+| `OPENAI_API_KEY` | OpenAI key with embeddings + chat access |
+| `MCP_ACCESS_KEY` | Random 32-byte hex; what clients send as `x-brain-key` |
+
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are auto-injected by the Edge runtime — do NOT set them manually.
+
+### 4. Wire a client
+
+Claude Code / Claude Desktop `~/.claude.json`:
+
+```json
+{
+  "mcpServers": {
+    "open-brain": {
+      "type": "http",
+      "url": "https://zjacstloskeynbblhgno.supabase.co/functions/v1/open-brain",
+      "headers": { "x-brain-key": "<MCP_ACCESS_KEY>" }
+    }
+  }
+}
+```
+
+Restart the client. The new MCP tools (`capture_thought`, `search_thoughts`, …) will appear.
+
+---
+
+## Files
+
+- `server/index.ts` — the Edge Function (OB1 upstream + OpenAI-base-URL substitution)
+- `server/deno.json` — Deno import map for npm dependencies
+- `CLAUDE.md` — agent instructions for working in this repo
+- `LICENSE.md` — FSL-1.1-MIT
+
+---
+
+## Migration history (2026-05-13)
+
+This repo used to be a local Node + stdio server. On 2026-05-13 it was ripped out and replaced with the OB1 Edge Function flavor, because the stdio server had been silently failing for weeks (Supabase project had paused; `brain_capture` calls were erroring with no surfacing). 21 legacy `thoughts` rows were reshaped from `(raw_text, thought_type, people[], topics[], action_items[], source, summary, archived)` into OB1's `(content, metadata jsonb)` shape in a single in-DB migration that preserved every embedding. The legacy table lives on as `public.thoughts_legacy_2026_05_13` for rollback.
