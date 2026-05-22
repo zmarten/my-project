@@ -21,6 +21,11 @@ projects/Brain.old-2026-05-13/
 
 # Not yet ready to push
 projects/garminexport/
+projects/OpenClaw/
+
+# Merged elsewhere — local copies kept on disk as scratch
+projects/UplandHunter/
+projects/Waypoint Enrichment/
 
 # command-center scratch (project lives at projects/command-center, but these are local-only)
 projects/command-center/.claude/
