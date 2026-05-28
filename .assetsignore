@@ -3,6 +3,7 @@ projects/MTNTOUGH PP30/
 # Hide the source tree (TS, tests, package.json) from public serving.
 projects/onx converter/
 *.mp4
+!media/*.mp4
 .git/
 .wrangler/
 node_modules/
