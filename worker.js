@@ -1,9 +1,43 @@
 const PP30_PREFIX = "/projects/MTNTOUGH PP30";
 
+/*
+ * Bucket List.
+ *
+ * The shell stays PUBLIC on purpose. It is an offline-first PWA, so if the login covers
+ * index.html the service worker caches the login page and the installed app opens to a
+ * sign-in screen it cannot get past with no signal. Gate the data, never the shell.
+ */
+const BL_APP = "/projects/bucketlisttrainer/app";
+const BL_DATA = "/projects/bucketlisttrainer/app/program.json";
+const BL_SIGNIN = "/projects/bucketlisttrainer/signin";
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const decodedPath = decodeURIComponent(url.pathname);
+
+    /*
+     * The only path Cloudflare Access itself guards. Navigating here triggers the login
+     * and then bounces back into the app. Access redirects browsers, which is right for a
+     * page you navigate to and wrong for a fetch() expecting JSON.
+     */
+    if (decodedPath === BL_SIGNIN) {
+      const auth = await requireAuthenticatedUser(request, env);
+      if (!auth.ok) return json({ error: auth.error }, 401);
+
+      /* Only ever bounce to our own app. An unchecked redirect parameter on an endpoint
+         sitting behind a real identity check is an open redirect. */
+      const want = url.searchParams.get("redirect") || "";
+      const to = want.startsWith(BL_APP) ? want : BL_APP + "/";
+      return Response.redirect(new URL(to, url.origin).toString(), 302);
+    }
+
+    /* Data and the future API. 401 as JSON, never a redirect, so the app can act on it. */
+    if (decodedPath === BL_DATA || decodedPath.startsWith("/api/bucketlist/")) {
+      const auth = await requireAuthenticatedUser(request, env);
+      if (!auth.ok) return json({ error: "signin_required", signin: BL_SIGNIN }, 401);
+      /* Authenticated. Fall through to ASSETS, which serves the real file. */
+    }
 
     if (decodedPath.startsWith("/api/pp30/")) {
       const auth = await requireAuthenticatedUser(request, env);
@@ -25,7 +59,14 @@ async function requireAuthenticatedUser(request, env) {
   const hostname = new URL(request.url).hostname;
   if (hostname === "localhost" || hostname === "127.0.0.1") return { ok: true };
 
-  const token = request.headers.get("Cf-Access-Jwt-Assertion") || "";
+  /*
+   * Access injects Cf-Access-Jwt-Assertion only for paths inside an Access application.
+   * Everything else sees the CF_Authorization cookie, which Access sets for the whole zone
+   * after login. Reading both is what lets one narrow Access path protect many routes.
+   */
+  const token = request.headers.get("Cf-Access-Jwt-Assertion")
+    || readCookie(request, "CF_Authorization")
+    || "";
   if (!env.ACCESS_TEAM_DOMAIN || !env.ACCESS_AUD) {
     return { ok: false, error: "Cloudflare Access JWT validation is not configured" };
   }
@@ -92,6 +133,15 @@ function base64UrlDecode(value) {
 function base64UrlToBytes(value) {
   const binary = atob(normalizeBase64Url(value));
   return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+}
+
+function readCookie(request, name) {
+  const raw = request.headers.get("Cookie") || "";
+  for (const part of raw.split(";")) {
+    const [key, ...rest] = part.trim().split("=");
+    if (key === name) return rest.join("=");
+  }
+  return "";
 }
 
 function normalizeBase64Url(value) {

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Methodology / Why the plan is shaped this way</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --spruce:#0F1C18;--spruce-deep:#0A1310;--moss:#18291F;--moss-hi:#20362A;
+  --lichen:#7A9480;--lichen-dim:#4A5F51;--bone:#E9E5D8;--bone-dim:#B9B5A6;
+  --ember:#C4603A;--gold:#D6A648;
+  --line:rgba(122,148,128,.22);--line-strong:rgba(122,148,128,.4);--r:3px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  background:var(--spruce);color:var(--bone);
+  font-family:'DM Sans',system-ui,sans-serif;font-size:15.5px;line-height:1.62;
+  padding-bottom:60px;
+  background-image:
+    repeating-linear-gradient(0deg,transparent 0 47px,rgba(122,148,128,.045) 47px 48px),
+    repeating-linear-gradient(90deg,transparent 0 47px,rgba(122,148,128,.045) 47px 48px);
+}
+.wrap{max-width:700px;margin:0 auto;padding:0 20px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--lichen)}
+h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;line-height:1.05;letter-spacing:-.02em}
+
+.masthead{border-bottom:1px solid var(--line-strong);padding:30px 0 24px;margin-bottom:8px}
+.masthead .eyebrow{display:block;margin-bottom:11px}
+.masthead h1{font-size:clamp(29px,7.6vw,46px)}
+.masthead h1 em{font-style:normal;color:var(--ember)}
+.lede{color:var(--bone-dim);margin-top:14px;font-size:16px}
+
+/* table of contents */
+.toc{border:1px solid var(--line);border-radius:var(--r);background:var(--moss);padding:6px 0;margin:26px 0 10px}
+.toc a{display:flex;gap:12px;align-items:baseline;padding:8px 16px;color:var(--bone-dim);text-decoration:none;font-size:14px;border-bottom:1px solid var(--line)}
+.toc a:last-child{border-bottom:0}
+.toc a:hover,.toc a:focus-visible{background:var(--moss-hi);color:var(--bone);outline:none}
+.toc .tn{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--lichen-dim);flex:none;width:22px}
+.toc .tt{flex:1}
+.toc .tw{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--lichen-dim);flex:none}
+
+section{padding:38px 0 0;scroll-margin-top:12px}
+.shead{border-bottom:1px solid var(--line-strong);padding-bottom:11px;margin-bottom:20px}
+.shead .eyebrow{display:block;margin-bottom:7px}
+.shead h2{font-size:clamp(22px,5.4vw,30px)}
+.shead .meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--lichen);margin-top:8px;letter-spacing:.04em}
+
+h3{font-size:17px;font-weight:600;margin:26px 0 9px;color:var(--bone)}
+p{margin:13px 0;color:var(--bone-dim)}
+p strong,li strong{color:var(--bone);font-weight:500}
+ul{margin:13px 0 13px 19px;color:var(--bone-dim)}
+li{margin:7px 0}
+
+/* the concept card */
+.concept{border:1px solid var(--line);border-left:2px solid var(--gold);border-radius:var(--r);background:var(--moss);padding:15px 17px;margin:20px 0}
+.concept .eyebrow{display:block;color:var(--gold);margin-bottom:7px}
+.concept h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:16.5px;letter-spacing:-.01em;margin-bottom:6px}
+.concept p{margin:9px 0;font-size:14.5px}
+.concept p:last-child{margin-bottom:0}
+.src{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--lichen-dim);margin-top:11px;padding-top:9px;border-top:1px dotted var(--line);letter-spacing:.02em}
+
+/* application callout */
+.applied{border:1px solid var(--line);border-left:2px solid var(--ember);border-radius:var(--r);background:rgba(10,19,16,.5);padding:14px 17px;margin:20px 0}
+.applied .eyebrow{display:block;color:var(--ember);margin-bottom:6px}
+.applied p{margin:7px 0;font-size:14.5px}
+.applied p:last-child{margin-bottom:0}
+
+/* honesty box */
+.caveat{border:1px dashed var(--line-strong);border-radius:var(--r);padding:14px 17px;margin:20px 0;background:transparent}
+.caveat .eyebrow{display:block;color:var(--lichen);margin-bottom:6px}
+.caveat p{margin:7px 0;font-size:14px;font-style:italic}
+
+blockquote{border-left:2px solid var(--line-strong);padding-left:16px;margin:18px 0;color:var(--bone);font-size:16px}
+
+.foot{margin-top:46px;padding:22px 0 10px;border-top:1px solid var(--line-strong);font-size:12.5px;color:var(--lichen-dim)}
+a{color:var(--ember)}
+@media (max-width:520px){.wrap{padding:0 15px}body{font-size:15px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <span class="eyebrow">Companion reference / methodology</span>
+  <h1>Why the plan is<br>shaped <em>this way</em>.</h1>
+  <p class="lede">Every structural decision in the 54-week plan, the training science underneath it, and the places where I am extrapolating beyond what the evidence actually says.</p>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <a href="#core"><span class="tn">00</span><span class="tt">The core problem: three incompatible demands</span><span class="tw">Framework</span></a>
+  <a href="#cross"><span class="tn">--</span><span class="tt">Principles that run through every block</span><span class="tw">All year</span></a>
+  <a href="#b1"><span class="tn">01</span><span class="tt">Strip &amp; Skill</span><span class="tw">12 wk</span></a>
+  <a href="#b2"><span class="tn">02</span><span class="tt">Power &amp; Olympic</span><span class="tw">15 wk</span></a>
+  <a href="#b3"><span class="tn">03</span><span class="tt">Max Strength</span><span class="tw">12 wk</span></a>
+  <a href="#b4"><span class="tn">04</span><span class="tt">Speed &amp; Bike</span><span class="tw">5 wk</span></a>
+  <a href="#b5"><span class="tn">05</span><span class="tt">Mountain</span><span class="tw">10 wk</span></a>
+  <a href="#limits"><span class="tn">--</span><span class="tt">Where the evidence runs out</span><span class="tw">Honesty</span></a>
+</nav>
+
+<!-- ============ 00 ============ -->
+<section id="core">
+  <div class="shead">
+    <span class="eyebrow">Framework</span>
+    <h2>The core problem</h2>
+  </div>
+
+  <p>Your twelve goals are not one training problem. They are three, and they pull against each other:</p>
+  <ul>
+    <li><strong>Maximal absolute strength</strong> (600 deadlift, 315 bench) wants body mass, low systemic fatigue, and minimal cardio.</li>
+    <li><strong>Relative strength and power</strong> (muscle-ups, HSPU, handstand walk, dunk, the Olympic lifts) wants leanness, high rate of force development, and lots of low-fatigue skill practice.</li>
+    <li><strong>Mountain endurance</strong> (Gallatin Crest, Bangtail, the mile) wants large volumes of aerobic work and leanness, and it actively blunts the first category.</li>
+  </ul>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>The interference effect</h4>
+    <p>Training strength and endurance simultaneously produces smaller strength and power gains than training strength alone. Hickson first documented this in 1980, and it has held up across decades of replication.</p>
+    <p>What the later work added matters more than the original finding. A 2012 meta-analysis by Wilson and colleagues found that the interference is <strong>dose-dependent</strong> — it scales with the frequency and duration of endurance work — and that it is <strong>modality-dependent</strong>, with running interfering substantially more than cycling. Hypertrophy and power suffer more than maximal strength does.</p>
+    <p class="src">Hickson 1980 · Wilson et al. 2012, J Strength Cond Res</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>You cannot eliminate the interference because you want goals from all three categories. So the plan does three things instead: <strong>sequences</strong> the emphasis so each quality gets a dedicated window, keeps aerobic work at a deliberate <strong>maintenance dose</strong> during strength blocks rather than dropping it, and puts that maintenance work <strong>on the bike</strong> where the interference penalty is smallest.</p>
+    <p>The bike choice is not incidental. It is the single cheapest concession available, and it doubles as Bangtail preparation.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Block periodization and residual training effects</h4>
+    <p>Traditional periodization trains many qualities at once and progresses them together. Block periodization concentrates on a small number of compatible qualities per block, on the reasoning that a concentrated stimulus produces a larger adaptation than a diluted one.</p>
+    <p>This only works because adaptations <strong>decay slowly and at different rates</strong>. Issurin's work on residual training effects estimates that aerobic endurance and maximal strength persist roughly 25 to 35 days after training for them stops, while maximal speed and anaerobic qualities fade faster, in the range of 5 to 15 days.</p>
+    <p>That asymmetry is why the block order is not arbitrary. Slow-decaying qualities can be built early and left to coast. Fast-decaying qualities have to sit close to when you need them.</p>
+    <p class="src">Issurin 2008, 2010 · residual training effects</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Aerobic base starts in August and gets maintained rather than rebuilt, because it decays slowly and takes the longest to build. Maximal velocity work sits in the winter block immediately before the dunk attempt, because it fades fast. The mile attempt sits four weeks into a speed block rather than eight months after one.</p>
+    <p>It is also why <strong>gymnastics skill work moves to the front of the year</strong>, not the back. Motor skills, once genuinely learned, are among the most durable adaptations there are.</p>
+  </div>
+</section>
+
+<!-- ============ CROSS ============ -->
+<section id="cross">
+  <div class="shead">
+    <span class="eyebrow">Runs through every block</span>
+    <h2>Cross-cutting principles</h2>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>The fitness-fatigue model</h4>
+    <p>Performance at any moment is the sum of two things a training session creates: a fitness effect that is large and long-lasting, and a fatigue effect that is larger but decays faster. You get stronger during the session and you express it after the fatigue clears.</p>
+    <p>This is the entire rationale for deload weeks and tapers. Neither adds fitness. Both remove fatigue so that fitness already built becomes visible.</p>
+    <p class="src">Banister et al., impulse-response modelling</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Every block runs a three-weeks-build, one-week-reduced pattern. The week after a down week usually feels like a jump in capability, and that feeling is fatigue clearing, not fitness arriving.</p>
+    <p>It is also why the plan tells you not to add anything back during a light week. Filling a deload converts it into a normal week and forfeits the adaptation you were buying.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Maintenance costs far less than building</h4>
+    <p>Strength and muscle can be held with a substantially reduced training volume, provided <strong>intensity is maintained</strong>. Work by Bickel and colleagues found that a fraction of the original volume preserved gains in younger adults, and the consistent thread across this literature is that intensity is the variable you must not cut.</p>
+    <p>The same asymmetry holds for aerobic fitness, where roughly two quality sessions a week preserves most of what a larger volume built.</p>
+    <p class="src">Bickel et al. 2011 · detraining and maintenance literature</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>During Blocks 4 and 5 your strength work drops to two sessions of two lifts, but the percentages stay at 78 to 82%. That is deliberately heavy for a maintenance dose. Cut the sets, never the weight.</p>
+    <p>Conversely, aerobic work never drops below two sessions weekly even in the middle of the max strength block. Rebuilding a base costs months. Holding one costs ninety minutes a week.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Protein and energy availability during a deficit</h4>
+    <p>A meta-analysis by Morton and colleagues found that protein intake benefits for resistance-trained gains plateau around 1.6 g per kg of bodyweight per day. In an <strong>energy deficit</strong> the requirement goes up, not down. Mettler and colleagues showed that a high-protein intake during energy restriction substantially preserved lean mass in athletes compared with a moderate intake, and review recommendations for lean athletes cutting weight run considerably higher than the maintenance figure.</p>
+    <p>Resistance training during the deficit is the other half. Protein without a training stimulus does not preserve much.</p>
+    <p class="src">Morton et al. 2018, BJSM · Mettler et al. 2010, MSSE · Helms et al. 2014</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Your 210 g at a 237 lb target is roughly 1.95 g per kg, which sits comfortably in the protective range. That number should not drop as your bodyweight does.</p>
+    <p>The GLP-1 context makes this sharper rather than softer. Appetite suppression makes hitting a protein target genuinely difficult, and weight lost without a resistance stimulus and adequate protein comes off as a meaningful fraction of lean mass. <strong>The Block 1 lifting sessions are the intervention</strong>, not an accessory to it.</p>
+    <p>It is also why the plan schedules the taper conversation with your prescriber for January. You cannot build a 600 deadlift while suppressed and under-eating, and Block 3 requires a surplus.</p>
+  </div>
+</section>
+
+<!-- ============ 01 ============ -->
+<section id="b1">
+  <div class="shead">
+    <span class="eyebrow">Block 01 · Aug 17 – Nov 8</span>
+    <h2>Strip &amp; Skill</h2>
+    <div class="meta">Deficit · 265 → 237 lbs · 12 weeks</div>
+  </div>
+
+  <h3>The governing idea</h3>
+  <p>A caloric deficit is a poor environment for building anything. So this block does not try to. It does two things a deficit is actually compatible with: <strong>preserving</strong> what you already have, and <strong>learning skills</strong>, which costs almost no recovery.</p>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Intensity preserves, volume fatigues</h4>
+    <p>When energy is restricted, the training variable that best protects strength and lean mass is <strong>load</strong>, not work. Heavy, low-volume resistance training signals the body to retain contractile tissue. High-volume, high-repetition circuit work adds fatigue and energy expenditure without adding that signal, which is the opposite of what you want when recovery capacity is already compromised.</p>
+    <p class="src">Applied from the resistance-training-during-restriction literature; consistent with Mettler et al. 2010</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Every strength session is 3 to 5 sets of 3 to 5 reps at 80 to 88%. There are no metabolic conditioning circuits in this block, and their absence is the intent rather than an oversight. The deficit handles fat loss. Lifting handles keeping the muscle you already paid for.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Relative strength scales with bodyweight</h4>
+    <p>A muscle-up, a handstand push-up, and a handstand walk are all expressions of strength <strong>relative to what you weigh</strong>. Reducing the denominator improves the ratio exactly as reliably as increasing the numerator does, and it is a great deal easier.</p>
+    <p>Dropping from 265 to 237 is an 11% reduction in the load you are pressing and pulling. That is worth roughly as much on a bar muscle-up as adding 30 lbs of pulling strength, and it is happening anyway.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Motor learning wants frequency, freshness, and distribution</h4>
+    <p>Skill acquisition is a nervous system adaptation and it behaves differently from strength. It responds to <strong>frequent short exposures</strong> rather than occasional long ones, and it degrades badly under fatigue — a rep performed with a broken pattern rehearses the broken pattern.</p>
+    <p>Distributed practice, spread across many sessions, consistently outperforms massed practice for skill retention.</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Twelve minutes, four days a week, <strong>before</strong> the lifting rather than tacked on at the end. Never to failure. This is why the gymnastics goals sit in a fat-loss block: skill work is nearly free in recovery terms, and it is one of the few things that genuinely progresses in a deficit.</p>
+    <p>The progressions run foundation (weeks 1 to 4), strength conversion (5 to 9), then attempts (10 to 12). Wall walks and hollow work before you ever try a strict HSPU is not stalling. It is building the positional strength the movement requires so the attempt has something to succeed with.</p>
+  </div>
+
+  <h3>Why front squat and jerk start now</h3>
+  <p>These are the long poles on the clean and jerk. Your jerk at 255 sits below your clean at 275, which is backwards for almost everyone and tells me the limiter is technical rather than muscular. Technical limiters respond to <strong>exposure over time</strong>, which means they need the full 28 weeks from August to February rather than the 15 weeks Block 2 alone would give them.</p>
+
+  <div class="caveat">
+    <span class="eyebrow">Where I am extrapolating</span>
+    <p>The exact ratio of what you can preserve in a 28 lb cut is not something the literature pins down for an individual. Holding your numbers through Block 1 is the realistic target and beating them would be a genuine surprise. That is why week 12 is a retest, not a PR attempt.</p>
+  </div>
+</section>
+
+<!-- ============ 02 ============ -->
+<section id="b2">
+  <div class="shead">
+    <span class="eyebrow">Block 02 · Nov 9 – Feb 21</span>
+    <h2>Power &amp; Olympic</h2>
+    <div class="meta">Maintenance · 237 lbs · 15 weeks</div>
+  </div>
+
+  <h3>The governing idea</h3>
+  <p>Power is the quality most punished by an energy deficit, so this block runs at maintenance calories. It groups every velocity-dominant goal you have — snatch, clean and jerk, and the dunk — into one window, because they share a physiological basis and train each other.</p>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>The force-velocity curve</h4>
+    <p>Force and velocity trade off against each other: the heavier the load, the slower it moves. Different training loads develop different points along that curve, and adaptation is <strong>reasonably specific to the point you train</strong>.</p>
+    <p>A maximal deadlift lives at the high-force, low-velocity end. A sprint or an unloaded jump lives at the opposite end. The Olympic lifts sit in the middle, which is why they express power better than either extreme.</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>The block covers the curve deliberately rather than living at one point. Heavy front squats sit at the force end. Olympic lifts occupy the middle. Sprints and jumps sit at the velocity end, well past anything a barbell can train. The dunk needs the velocity end specifically, which is why sprints appear at all.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Weightlifting is a skill sport, and rep schemes reflect that</h4>
+    <p>The classical Eastern European guidance on the competition lifts — most familiarly Prilepin's chart — keeps sets short at any given intensity: singles and doubles as percentages climb, rarely more than three reps above 80%. The reasoning is that technical quality degrades within a set faster than muscular capacity does, and a technically poor rep in a skill lift trains the wrong thing.</p>
+    <p class="src">Prilepin's chart · classical weightlifting programming</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Snatch and clean-and-jerk work runs at 5 or 6 sets of 1 to 2 reps rather than 3 sets of 5. Weeks 1 to 5 cap at 75%, which is the phase you will most want to skip and the one that matters most.</p>
+    <p>Your snatch is 67% of your clean when the normal ratio is 78 to 82%. That gap is not strength. You already own the strength to snatch 225 — a 225 snatch would put you at 82% of a clean you can already do. The gap is positional, and closing it is the cheapest single gain on the entire twelve-goal list.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>The stretch-shortening cycle and the shock method</h4>
+    <p>A muscle stretched immediately before it shortens produces more force than one shortening from rest, through a combination of elastic energy storage and reflex activation. This is what a countermovement jump exploits, and it is trainable.</p>
+    <p>Verkhoshansky's shock method — depth jumps being the canonical example — applies a rapid forced eccentric load to drive that adaptation. It is potent and it is also demanding, which is why the standard prescription progresses from <strong>extensive</strong> low-intensity contacts to <strong>intensive</strong> high-intensity ones rather than starting at the deep end.</p>
+    <p class="src">Verkhoshansky · plyometric training literature</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Weeks 1 to 6 are extensive: pogo hops, moderate box jumps, broad jumps, 80 to 120 ground contacts weekly, building tendon stiffness and elastic quality. Weeks 7 to 12 are intensive: depth jumps from 18 to 24 inches, single-leg bounds, 60 to 80 contacts.</p>
+    <p>Contacts are capped and always performed fresh, because a fatigued plyometric rep is a slow plyometric rep, and a slow plyometric rep is just eccentric loading with injury risk attached.</p>
+  </div>
+
+  <h3>The dunk math</h3>
+  <p>Standing reach 96.5 in, rim at 120 in, and a controlled one-hand dunk needs your hand around 126 in at apex. That is <strong>29.5 in of running vertical</strong>. Your demonstrated rim grab means you have produced at least 23.5 in already, at a heavier bodyweight than you will be carrying.</p>
+  <p>Two inputs close the remaining gap: roughly 4 to 6 in from the bodyweight reduction, and 3 to 5 in from a structured plyometric block. Both land in this window on purpose, and they land together.</p>
+</section>
+
+<!-- ============ 03 ============ -->
+<section id="b3">
+  <div class="shead">
+    <span class="eyebrow">Block 03 · Feb 22 – May 16</span>
+    <h2>Max Strength</h2>
+    <div class="meta">Surplus · 237 → 247 lbs · 12 weeks</div>
+  </div>
+
+  <h3>The governing idea</h3>
+  <p>This is the only block in the year that runs a surplus, and the 10 lb gain is a programmed variable rather than a slip. Maximal strength expression correlates with cross-sectional area and with the leverage a slightly heavier body provides. You take the weight back off in Blocks 4 and 5.</p>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Zatsiorsky's three methods</h4>
+    <p>Zatsiorsky framed strength training as three distinct approaches to producing maximal muscular tension:</p>
+    <ul>
+      <li><strong>Maximal effort</strong> — lifting a maximal or near-maximal load. Best for neural adaptation and rate coding.</li>
+      <li><strong>Dynamic effort</strong> — lifting a sub-maximal load at maximal velocity. Best for rate of force development.</li>
+      <li><strong>Repeated effort</strong> — lifting a sub-maximal load to or near failure. Best for hypertrophy.</li>
+    </ul>
+    <p>A complete block uses all three rather than picking one.</p>
+    <p class="src">Zatsiorsky, Science and Practice of Strength Training</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Monday is maximal effort bench. Thursday is repeated effort close-grip volume. Friday is dynamic effort speed pulls at 70% on the minute. Saturday is technical work at 65% with maximum acceleration intent. The Tuesday deadlift is maximal effort with a heavy single attached.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Expressing a maximum is a separate skill</h4>
+    <p>Repetition maxima and true single-rep maxima do not always agree, and the direction of the discrepancy is informative. An athlete whose rep max <strong>overpredicts</strong> their tested single is typically under-practiced at maximal effort: the neural elements of a limit attempt — full motor unit recruitment, rate coding, bracing under a load you have not handled — are trainable and specific.</p>
+    <p>Intent matters independently of load. Work going back to Behm and Sale demonstrated that the <em>attempt</em> to move a load explosively drives velocity-specific adaptation, even when the load itself does not permit high velocity.</p>
+    <p class="src">Behm &amp; Sale 1993 · rate coding and maximal effort literature</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>You pulled 500 for 3 with no specific preparation. Formulas put that near 550. Your actual tested single in December was 525. That gap is the tell.</p>
+    <p>So you get a <strong>90%-plus single every week from week one</strong>, which is not conventional programming — most plans hold singles back for the peak. The cost is one rep. The benefit is twelve weeks of practice at the specific skill your tested number is missing, and it is the cheapest available path from 525 to 600.</p>
+    <p>The heavy stimulus rotates every three weeks between block pulls, deficit pulls, and the competition pull, so the adaptation keeps coming without grinding a single groove into the ground.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Frequency, and why bench gets three days</h4>
+    <p>When total weekly volume is held equal, training frequency turns out to matter less than people assume — the meta-analytic work by Grgic and colleagues found modest differences at best for strength outcomes. The practical value of higher frequency is that it <strong>lets you accumulate more quality volume</strong> by splitting it into sessions you can each perform well, and for a skill-dependent lift it means more practice repetitions.</p>
+    <p class="src">Grgic et al., training frequency meta-analyses</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Bench gets three exposures because it recovers quickly and rewards practice. Deadlift gets one heavy day plus one speed day, because its recovery cost is disproportionate and there is no equivalent technical upside to more exposures.</p>
+    <p>Your long arms make bench a leverage problem as much as a strength problem. Arch, elbow tuck, and grip width changes are worth real weight before any adaptation arrives, and they are trained on the Saturday technical day.</p>
+  </div>
+</section>
+
+<!-- ============ 04 ============ -->
+<section id="b4">
+  <div class="shead">
+    <span class="eyebrow">Block 04 · May 17 – Jun 20</span>
+    <h2>Speed &amp; Bike</h2>
+    <div class="meta">247 → 240 lbs · 5 weeks · mile Jun 8, Bangtail Jun 19</div>
+  </div>
+
+  <h3>The governing idea</h3>
+  <p>A short speed block placed immediately after a max strength block is a deliberate sequence. You have just spent twelve weeks raising the force end of the curve. This block converts that into velocity.</p>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>A mile is mostly aerobic</h4>
+    <p>People treat the mile as a speed event. Energy system analyses of middle-distance running consistently put the aerobic contribution to a four-to-six minute effort at roughly <strong>80 to 85%</strong>, with the anaerobic share falling as duration rises.</p>
+    <p class="src">Middle-distance energy system contribution literature, e.g. Duffield et al.</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>This is the specific reason the plan refuses to let aerobic work drop below two sessions weekly for the entire preceding year. Five weeks of track work cannot produce a six-minute mile on its own. It can convert nine months of protected base into one.</p>
+    <p>Sessions alternate between goal-pace repeats (400s at exactly 90 seconds, training pace recognition and repeatability) and speed reserve or threshold work (200s faster than goal to make goal pace feel submaximal, 800s at threshold to raise the ceiling).</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Specificity has a ceiling and general fitness has a floor</h4>
+    <p>Transfer between modalities is real but partial. Aerobic adaptations — mitochondrial density, capillarization, stroke volume — carry across from cycling to running reasonably well. The peripheral and mechanical adaptations do not: saddle tolerance, handling under fatigue, and the particular muscular demand of sustained seated climbing are all cycling-specific.</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Five weeks of riding is only enough <em>because</em> you spent eight months putting easy aerobic volume on the bike. This block is adding the non-transferable parts — saddle time, technical handling, climbing specificity, fuelling rehearsal — to fitness you already own.</p>
+    <p>At least two long rides on real singletrack, because Bangtail is rocky and rooty and handling fatigue is a genuinely separate failure mode from leg fatigue.</p>
+  </div>
+
+  <div class="caveat">
+    <span class="eyebrow">Where I am extrapolating</span>
+    <p>Attaching a specific probability to a six-minute mile for an athlete who has never tested one is guesswork dressed up as analysis. Sixty-five percent is a judgement based on your training age, bodyweight trajectory, and the fact that your fast-twitch profile suits the event. Treat it as a considered opinion, not a calculation.</p>
+  </div>
+</section>
+
+<!-- ============ 05 ============ -->
+<section id="b5">
+  <div class="shead">
+    <span class="eyebrow">Block 05 · Jun 21 – Aug 29</span>
+    <h2>Mountain</h2>
+    <div class="meta">240 → 233 lbs · 10 weeks · Crest Aug 27–29</div>
+  </div>
+
+  <h3>The governing idea</h3>
+  <p>The Crest is a durability problem, not a fitness problem. You will have the aerobic capacity long before August. What decides the day is whether your legs still work at hour eight, whether your gut still accepts food, and whether the descent has destroyed you.</p>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>The repeated bout effect</h4>
+    <p>Unaccustomed eccentric exercise — downhill running being the classic example — causes substantial muscle damage, soreness, and force loss. A single prior bout confers <strong>marked protection</strong> against the same damage from a subsequent bout, and the protection lasts weeks to months.</p>
+    <p>The mechanisms are debated but the phenomenon is one of the most reliably reproduced findings in exercise physiology.</p>
+    <p class="src">Nosaka, Clarkson, and the repeated bout effect literature</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Every Thursday you run the entire descent rather than hiking it. This is not filler and it is not about aerobic fitness. It is deliberate accumulation of eccentric exposure so that on the day, the descent costs you far less than it otherwise would.</p>
+    <p>Skipping the downhill work is the most common way people arrive at a long mountain day aerobically ready and mechanically unprepared.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Heavy strength training helps endurance performance</h4>
+    <p>This runs counter to intuition, but the evidence is fairly consistent. Rønnestad and Mujika's review of concurrent training in endurance athletes concluded that heavy strength work improves performance in cyclists and runners, primarily through improved <strong>economy</strong> and delayed fatigue, without adding meaningful mass when programmed appropriately.</p>
+    <p class="src">Rønnestad &amp; Mujika 2014, Scand J Med Sci Sports</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Strength training stays in the block at two sessions of two lifts at 80%. It is a contributor to the Crest, not a concession to vanity, and it should be the last thing you cut when the week gets tight.</p>
+  </div>
+
+  <div class="concept">
+    <span class="eyebrow">Concept</span>
+    <h4>Tapering</h4>
+    <p>Tapering is one of the better-supported interventions in the whole field. Bosquet and colleagues' meta-analysis found that the optimal approach is a <strong>two-week taper with a substantial reduction in volume — on the order of 40 to 60% — while maintaining training intensity and frequency</strong>. Reducing intensity instead of volume gives up the benefit.</p>
+    <p class="src">Bosquet et al. 2007, Med Sci Sports Exerc</p>
+  </div>
+
+  <div class="applied">
+    <span class="eyebrow">How that shapes your plan</span>
+    <p>Week 9 cuts volume to 8,000 ft and a 20 mile long run. Week 10 cuts further but keeps short sharp efforts in, including pickups on the Tuesday. Feeling twitchy and underworked in taper week is the correct sensation, and the urge to add a confidence-building long run is the single most common way people undo a good build.</p>
+  </div>
+
+  <h3>Fuelling, specifically for you</h3>
+  <p>A heavy sweater on a low-carb dietary baseline is a combination that punishes improvisation. Fat oxidation at low intensity is likely a strength for you; carbohydrate tolerance at high intensity over many hours is likely underdeveloped, because gut absorption capacity is itself <strong>trainable and requires practice</strong>.</p>
+  <p>Every long session in this block carries a fuelling rehearsal for that reason. Weigh in and out on the long runs to establish your actual sweat rate rather than a guess, and settle sodium and carbohydrate per hour during the build.</p>
+</section>
+
+<!-- ============ LIMITS ============ -->
+<section id="limits">
+  <div class="shead">
+    <span class="eyebrow">Honesty</span>
+    <h2>Where the evidence runs out</h2>
+  </div>
+
+  <p>Most of what is above is well-supported at the level of <strong>principle</strong>. Almost none of it is well-supported at the level of <strong>your specific numbers on a specific date</strong>. The gap between those two things is where coaching judgement lives, and it is worth being explicit about which is which.</p>
+
+  <h3>What is solid</h3>
+  <ul>
+    <li>The interference effect and its modality dependence.</li>
+    <li>Protein requirements rising during energy restriction.</li>
+    <li>Maintenance requiring intensity but not volume.</li>
+    <li>Tapering protocols.</li>
+    <li>The repeated bout effect.</li>
+    <li>Heavy strength work benefiting endurance performance.</li>
+  </ul>
+
+  <h3>What is reasonable but softer</h3>
+  <ul>
+    <li>Specific residual training effect durations. The 30-day and 15-day figures are useful planning heuristics, not measured constants for an individual.</li>
+    <li>Block periodization outperforming traditional periodization. The theory is coherent and the applied evidence is mixed rather than decisive.</li>
+    <li>Exact percentage prescriptions. The waves in this plan are conventional and defensible, but a different competent coach would write different numbers and get similar results.</li>
+  </ul>
+
+  <h3>What is my judgement, not evidence</h3>
+  <ul>
+    <li><strong>Every confidence percentage on the targets table.</strong> These are considered opinions from your numbers and profile, not calculations.</li>
+    <li><strong>The inches attributed to weight loss on your vertical jump.</strong> Directionally sound, but the specific 4 to 6 inch figure is an estimate.</li>
+    <li><strong>Deferring C&amp;J 315 to year two.</strong> A defensible judgement about what fits, not a physiological limit. If your front squat tests over 315 in week one, I would revisit it.</li>
+    <li><strong>The whole block order.</strong> A different sequence could work. This one is built around your hunting season, an infant, a new job, and the fact that gymnastics goals get cheaper as you get lighter.</li>
+  </ul>
+
+  <div class="caveat">
+    <span class="eyebrow">The thing that actually decides this year</span>
+    <p>None of the above will be the limiting factor. Sleep, consistency through hunting season, and whether you protect two lower-body sessions a week during the cut will matter more than any programming decision in this document. Plans fail on adherence far more often than on design.</p>
+  </div>
+</section>
+
+<div class="foot">Companion to the 54-week plan · Built for the field. Smart enough for the desk.</div>
+
+</div>
+</body>
+</html>

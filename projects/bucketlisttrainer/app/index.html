@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bucket List</title>
+<meta name="description" content="Aug 2026 to Aug 2027. Twelve goals, 385 sessions.">
+<meta name="theme-color" content="#0F1C18">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bucket List">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<div id="boot" class="boot">
+  <div class="boot-mark"></div>
+  <p class="boot-msg">Loading the year</p>
+</div>
+
+<header class="topbar" id="topbar" hidden>
+  <button class="tb-btn" id="prevBtn" type="button" aria-label="Previous day">
+    <span aria-hidden="true">&#8249;</span>
+  </button>
+  <div class="tb-mid">
+    <span class="tb-week mono" id="tbWeek"></span>
+    <span class="tb-block" id="tbBlock"></span>
+  </div>
+  <button class="tb-btn" id="nextBtn" type="button" aria-label="Next day">
+    <span aria-hidden="true">&#8250;</span>
+  </button>
+</header>
+
+<main id="view" class="view" hidden></main>
+
+<nav class="tabbar" id="tabbar" hidden>
+  <button class="tab is-active" type="button" data-tab="today">
+    <span class="tab-k">Today</span>
+  </button>
+  <button class="tab" type="button" data-tab="week">
+    <span class="tab-k">Week</span>
+  </button>
+  <button class="tab" type="button" data-tab="goals">
+    <span class="tab-k">Goals</span>
+  </button>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>

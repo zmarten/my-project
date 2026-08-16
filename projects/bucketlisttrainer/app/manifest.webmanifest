@@ -1,0 +1,16 @@
+{
+  "name": "Bucket List Training",
+  "short_name": "Bucket List",
+  "description": "Aug 2026 to Aug 2027. Twelve goals, 385 sessions.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0F1C18",
+  "theme_color": "#0F1C18",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -10,8 +10,12 @@
 	"vars": {
 		"REQUIRE_ACCESS": "true",
 		"ALLOWED_EMAILS": "zachdmartens@gmail.com",
-		"ACCESS_TEAM_DOMAIN": "",
-		"ACCESS_AUD": ""
+		// Zero Trust team name. Issuer is https://<this>.cloudflareaccess.com
+		"ACCESS_TEAM_DOMAIN": "broad-fire-9fe2",
+		// AUD tag of the "Bucket List sign-in" Access application. worker.js validates every
+		// gated path against this single audience, so one login also covers PP30, whose API
+		// had been returning 401 to everything while this was empty.
+		"ACCESS_AUD": "f6dc1b6121715a8c4ed8e6c9e580eaa679ccea5d33cd119ba76a63281e721f30"
 	},
 	"d1_databases": [
 		{

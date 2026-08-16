@@ -1,0 +1,20 @@
+{
+  "name": "bucketlist-training",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "today": "npm run build --silent && node dist/cli.js today",
+    "week": "npm run build --silent && node dist/cli.js week",
+    "check": "npm run build --silent && node dist/cli.js check",
+    "export": "npm run build --silent && node dist/cli.js export",
+    "targets": "npm run build --silent && node dist/cli.js targets",
+    "athlete": "npm run build --silent && node dist/cli.js athlete",
+    "app": "npm run check && npm run export"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "typescript": "^5.6.0"
+  }
+}
